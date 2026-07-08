@@ -64,6 +64,10 @@ a {
 
 a:hover { color: var(--primary-hover); }
 
+.text-muted {
+    color: var(--text-muted) !important;
+}
+
 /* ─── App Shell (authenticated) ─── */
 .app-shell {
     display: flex;
