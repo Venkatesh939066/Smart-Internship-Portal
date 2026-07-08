@@ -33,47 +33,43 @@
             {
                 @foreach (var internship in Model)
                 {
-                    <div class="card shadow-sm border-0 mb-4 internship-card">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div class="d-flex align-items-center">
-                                    <div class="company-logo me-3" style="width: 70px; height: 70px; background: #2a2f3b; display: flex; align-items: center; justify-content: center; border-radius: 8px; overflow: hidden;">
-                                        @{
-                                            var homeCompanyName = internship.Company?.FullName as string ?? string.Empty;
-                                            var homeCompanyFileName = new string(homeCompanyName.ToLower().Where(c => char.IsLetterOrDigit(c) || c == ' ').ToArray()).Replace(" ", "-");
-                                            var homeCompanyLogoPath = System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "wwwroot", "images", "company-logos", $"{homeCompanyFileName}.svg");
-                                            var homeCompanyLogoSrc = $"/images/company-logos/{homeCompanyFileName}.svg";
-                                            var homeHasCompanyLogo = System.IO.File.Exists(homeCompanyLogoPath);
-                                        }
-                                        @if (homeHasCompanyLogo)
-                                        {
-                                            <img src="@homeCompanyLogoSrc" alt="@internship.Company?.FullName logo" style="width: 100%; height: 100%; object-fit: contain; padding: 4px;" />
-                                        }
-                                        else
-                                        {
-                                            <span class="text-white fw-bold" style="font-size: 1.5rem;">
-                                                @(string.IsNullOrEmpty(internship.Company?.FullName) ? "C" : internship.Company.FullName.Substring(0, 1).ToUpper())
-                                            </span>
-                                        }
-                                    </div>
-                                    <div class="ms-2">
-                                        <h4 class="fw-bold mb-1" style="font-size: 1.25rem;">@internship.Title</h4>
-                                        <h5 class="text-primary mb-2" style="font-size: 1rem;">@(internship.Company?.FullName ?? "Unknown Company")</h5>
-                                        <div class="text-muted mb-2 small">
-                                            <i class="bi bi-geo-alt-fill"></i> @internship.Location &nbsp;&nbsp;
-                                            <i class="bi bi-calendar-event"></i> @internship.PostedDate.ToString("dd MMM yyyy")
-                                        </div>
-                                        <div class="mb-3">
-                                            @foreach (var skill in internship.InternshipSkills)
-                                            {
-                                                <span class="badge bg-primary me-2 mb-1">@skill.Skill.Name</span>
-                                            }
-                                        </div>
-                                        <div class="d-flex gap-2">
-                                            <a asp-controller="Home" asp-action="CompanyDetails" asp-route-id="@internship.CompanyId" class="btn btn-sm btn-outline-secondary">Company</a>
-                                            <a asp-controller="Student" asp-action="Details" asp-route-id="@internship.Id" class="btn btn-sm btn-primary">View Role</a>
-                                        </div>
-                                    </div>
+                    <div class="internship-card">
+                        <div class="job-card-left">
+                            <div class="company-logo-box" style="width: 70px; height: 70px; background: #2a2f3b; display: flex; align-items: center; justify-content: center; border-radius: 8px; overflow: hidden; flex-shrink: 0;">
+                                @{
+                                    var homeCompanyName = internship.Company?.FullName as string ?? string.Empty;
+                                    var homeCompanyFileName = new string(homeCompanyName.ToLower().Where(c => char.IsLetterOrDigit(c) || c == ' ').ToArray()).Replace(" ", "-");
+                                    var homeCompanyLogoPath = System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "wwwroot", "images", "company-logos", $"{homeCompanyFileName}.svg");
+                                    var homeCompanyLogoSrc = $"/images/company-logos/{homeCompanyFileName}.svg";
+                                    var homeHasCompanyLogo = System.IO.File.Exists(homeCompanyLogoPath);
+                                }
+                                @if (homeHasCompanyLogo)
+                                {
+                                    <img src="@homeCompanyLogoSrc" alt="@internship.Company?.FullName logo" style="width: 100%; height: 100%; object-fit: contain; padding: 4px;" />
+                                }
+                                @else
+                                {
+                                    <span class="text-white fw-bold" style="font-size: 1.5rem;">
+                                        @(string.IsNullOrEmpty(internship.Company?.FullName) ? "C" : internship.Company.FullName.Substring(0, 1).ToUpper())
+                                    </span>
+                                }
+                            </div>
+                            <div class="job-details">
+                                <h3 class="job-title" style="font-size: 1.25rem; font-weight: 700; margin: 0 0 6px 0; color: var(--text-main);">@internship.Title</h3>
+                                <h5 class="company-name" style="font-size: 1rem; color: var(--primary); margin: 0 0 8px 0; font-weight: 600;">@(internship.Company?.FullName ?? "Unknown Company")</h5>
+                                <div class="job-info" style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">
+                                    <i class="bi bi-geo-alt-fill"></i> @internship.Location &nbsp;&nbsp;&nbsp;&nbsp;
+                                    <i class="bi bi-calendar-event"></i> @internship.PostedDate.ToString("dd MMM yyyy")
+                                </div>
+                                <div class="skills-list" style="margin-bottom: 16px;">
+                                    @foreach (var skill in internship.InternshipSkills)
+                                    {
+                                        <span class="badge bg-primary me-2 mb-1" style="padding: 6px 12px; font-weight: 600; border-radius: 6px;">@skill.Skill.Name</span>
+                                    }
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <a asp-controller="Home" asp-action="CompanyDetails" asp-route-id="@internship.CompanyId" class="btn btn-sm btn-outline-light" style="border: 1px solid var(--border-color); color: var(--text-main); font-weight: 600; border-radius: 8px; padding: 6px 16px;">Company</a>
+                                    <a asp-controller="Student" asp-action="Details" asp-route-id="@internship.Id" class="btn btn-sm btn-primary" style="font-weight: 600; border-radius: 8px; padding: 6px 16px;">View Role</a>
                                 </div>
                             </div>
                         </div>
