@@ -316,6 +316,8 @@ public async Task<IActionResult> Applicants(int id)
     var internship = await _context.Internships
         .Include(i => i.Applications)
             .ThenInclude(a => a.Student)
+                .ThenInclude(s => s.UserSkills)
+                    .ThenInclude(us => us.Skill)
         .FirstOrDefaultAsync(i =>
             i.Id == id &&
             i.CompanyId == company.Id);

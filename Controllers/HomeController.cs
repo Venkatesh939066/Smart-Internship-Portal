@@ -166,6 +166,28 @@ public class HomeController : Controller
         return View();
     }
 
+    [Microsoft.AspNetCore.Authorization.Authorize]
+    [HttpGet]
+    public async Task<IActionResult> ExportResume(string? id)
+    {
+        var currentUser = await _userManager.GetUserAsync(User);
+        if (currentUser == null) return Challenge();
+
+        var targetUserId = string.IsNullOrEmpty(id) ? currentUser.Id : id;
+
+        var user = await _context.Users
+            .Include(u => u.UserSkills)
+                .ThenInclude(us => us.Skill)
+            .FirstOrDefaultAsync(u => u.Id == targetUserId);
+
+        if (user == null)
+        {
+            return NotFound("Student not found.");
+        }
+
+        return View("~/Views/Student/ExportResume.cshtml", user);
+    }
+
     public IActionResult Privacy()
     {
         return View();
