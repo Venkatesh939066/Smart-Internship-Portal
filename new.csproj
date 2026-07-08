@@ -1,10 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>SmartInternshipPortal</RootNamespace>
+    <UserSecretsId>e87ade70-e82e-4bde-b497-042328954245</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
