@@ -25,6 +25,7 @@ pip-log.txt
 *.rar
 *.tar.gz
 app_db/
+app.db*
 App_Data/DataProtectionKeys/
 
 # Agents configuration
