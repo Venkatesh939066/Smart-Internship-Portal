@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SmartInternshipPortal.Models;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -22,7 +23,7 @@ namespace SmartInternshipPortal.Controllers
         }
 
         // GET: Message?withUserId=xxx
-        public async Task<IActionResult> Index(string withUserId)
+        public async Task<IActionResult> Index(string? withUserId)
         {
             var currentUser = await _userManager.GetUserAsync(User);
             if (currentUser == null)
@@ -30,7 +31,31 @@ namespace SmartInternshipPortal.Controllers
 
             if (string.IsNullOrEmpty(withUserId))
             {
-                return RedirectToAction("Index", currentUser.Role == "Company" ? "Company" : "Student");
+                // Fetch all conversations for current user
+                var userMessages = await _context.Messages
+                    .Where(m => m.SenderId == currentUser.Id || m.ReceiverId == currentUser.Id)
+                    .Include(m => m.Sender)
+                    .Include(m => m.Receiver)
+                    .OrderByDescending(m => m.SentAt)
+                    .ToListAsync();
+
+                var conversations = userMessages
+                    .GroupBy(m => m.SenderId == currentUser.Id ? m.ReceiverId : m.SenderId)
+                    .Select(g => {
+                        var lastMsg = g.First();
+                        var otherUser = lastMsg.SenderId == currentUser.Id ? lastMsg.Receiver : lastMsg.Sender;
+                        var unreadCount = g.Count(m => m.ReceiverId == currentUser.Id && !m.IsRead);
+                        return new ConversationViewModel
+                        {
+                            OtherUser = otherUser,
+                            LastMessage = lastMsg,
+                            UnreadCount = unreadCount
+                        };
+                    })
+                    .ToList();
+
+                ViewBag.CurrentUser = currentUser;
+                return View("Inbox", conversations);
             }
 
             var otherUser = await _userManager.FindByIdAsync(withUserId);
@@ -89,5 +114,12 @@ namespace SmartInternshipPortal.Controllers
 
             return RedirectToAction("Index", new { withUserId = receiverId });
         }
+    }
+
+    public class ConversationViewModel
+    {
+        public ApplicationUser OtherUser { get; set; } = null!;
+        public Message LastMessage { get; set; } = null!;
+        public int UnreadCount { get; set; }
     }
 }

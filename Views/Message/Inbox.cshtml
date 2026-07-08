@@ -1,0 +1,277 @@
+@model List<SmartInternshipPortal.Controllers.ConversationViewModel>
+@{
+    var currentUser = ViewBag.CurrentUser as SmartInternshipPortal.Models.ApplicationUser;
+    ViewData["Title"] = "My Messages";
+    var isCompany = currentUser?.Role == "Company";
+}
+
+<div class="inbox-outer-container">
+    <div class="inbox-header-card">
+        <div class="header-text">
+            <h2>💬 Messages Inbox</h2>
+            <p>Communicate directly with recruiters or candidate applicants regarding active roles.</p>
+        </div>
+        <div>
+            <a href="@(isCompany ? "/Company/Index" : "/Student/Index")" class="inbox-back-btn">
+                <i class="bi bi-arrow-left-short"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <div class="conversations-list-container">
+        @if (Model.Any())
+        {
+            @foreach (var convo in Model)
+            {
+                var otherUser = convo.OtherUser;
+                var lastMsg = convo.LastMessage;
+                var unreadCount = convo.UnreadCount;
+                var otherInitial = string.IsNullOrWhiteSpace(otherUser.FullName) ? "U" : otherUser.FullName.Trim()[0].ToString().ToUpper();
+                
+                <a href="/Message?withUserId=@otherUser.Id" class="convo-card-link">
+                    <div class="convo-card @(unreadCount > 0 ? "has-unread" : "")">
+                        <div class="convo-avatar">
+                            @if (!string.IsNullOrEmpty(otherUser.ProfileImage))
+                            {
+                                <img src="@otherUser.ProfileImage" alt="@otherUser.FullName" class="convo-avatar-img" />
+                            }
+                            else
+                            {
+                                <span>@otherInitial</span>
+                            }
+                        </div>
+                        <div class="convo-details">
+                            <div class="convo-meta-header">
+                                <h3 class="convo-name">@otherUser.FullName</h3>
+                                <span class="convo-time">@lastMsg.SentAt.ToString("g")</span>
+                            </div>
+                            <div class="convo-sub-line">
+                                <span class="convo-role-badge">@(otherUser.Role == "Company" ? "Recruiter" : "Applicant")</span>
+                                @if (unreadCount > 0)
+                                {
+                                    <span class="unread-count-pill">@unreadCount new</span>
+                                }
+                            </div>
+                            <p class="convo-last-msg">
+                                @(lastMsg.SenderId == currentUser?.Id ? "You: " : "")@lastMsg.Content
+                            </p>
+                        </div>
+                    </div>
+                </a>
+            }
+        }
+        else
+        {
+            <div class="inbox-empty-state">
+                <div class="inbox-empty-icon">✉️</div>
+                <h3>No messages yet</h3>
+                <p>Your conversations will appear here once a recruiter or student applicant starts a conversation with you.</p>
+                <a href="@(isCompany ? "/Company/Index" : "/Student/Browse")" class="btn btn-primary mt-3">
+                    @(isCompany ? "View Applicants" : "Browse Internships")
+                </a>
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    .inbox-outer-container {
+        display: flex;
+        flex-direction: column;
+        background: var(--bg-elevated);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        backdrop-filter: blur(16px);
+        box-shadow: var(--shadow-lg);
+        min-height: calc(100vh - var(--topbar-height) - 40px);
+    }
+
+    .inbox-header-card {
+        padding: 24px;
+        background: rgba(17, 24, 39, 0.6);
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .inbox-header-card h2 {
+        font-size: 20px;
+        font-weight: 700;
+        margin: 0 0 4px 0;
+        color: var(--text-main);
+    }
+
+    .inbox-header-card p {
+        font-size: 14px;
+        color: var(--text-muted);
+        margin: 0;
+    }
+
+    .inbox-back-btn {
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--text-main);
+        border: 1px solid var(--border-color);
+        padding: 8px 16px;
+        border-radius: var(--radius-md);
+        font-size: 14px;
+        font-weight: 600;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: all 0.2s;
+    }
+
+    .inbox-back-btn:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--primary);
+    }
+
+    .conversations-list-container {
+        flex: 1;
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        overflow-y: auto;
+    }
+
+    .convo-card-link {
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .convo-card {
+        display: flex;
+        gap: 16px;
+        padding: 16px;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid var(--border-color);
+        border-radius: var(--radius-md);
+        transition: all 0.2s;
+    }
+
+    .convo-card:hover {
+        background: rgba(255, 255, 255, 0.04);
+        border-color: var(--primary);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .convo-card.has-unread {
+        background: rgba(56, 189, 248, 0.03);
+        border-left: 4px solid var(--primary);
+    }
+
+    .convo-avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: var(--accent-gradient);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #ffffff;
+        font-weight: 700;
+        font-size: 18px;
+        overflow: hidden;
+        flex-shrink: 0;
+        border: 2px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .convo-avatar-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .convo-details {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+    }
+
+    .convo-meta-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 4px;
+    }
+
+    .convo-name {
+        font-size: 16px;
+        font-weight: 700;
+        margin: 0;
+        color: var(--text-main);
+    }
+
+    .convo-time {
+        font-size: 12px;
+        color: var(--text-muted);
+    }
+
+    .convo-sub-line {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 6px;
+    }
+
+    .convo-role-badge {
+        font-size: 11px;
+        font-weight: 600;
+        background: rgba(255, 255, 255, 0.06);
+        color: var(--text-muted);
+        padding: 1px 8px;
+        border-radius: 12px;
+    }
+
+    .unread-count-pill {
+        font-size: 10px;
+        font-weight: 700;
+        background: var(--primary);
+        color: #ffffff;
+        padding: 1px 6px;
+        border-radius: 8px;
+    }
+
+    .convo-last-msg {
+        font-size: 14px;
+        color: var(--text-muted);
+        margin: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .inbox-empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 60px 24px;
+        text-align: center;
+        color: var(--text-muted);
+    }
+
+    .inbox-empty-icon {
+        font-size: 54px;
+        margin-bottom: 16px;
+    }
+
+    .inbox-empty-state h3 {
+        color: var(--text-main);
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+
+    .inbox-empty-state p {
+        max-width: 400px;
+        margin: 0 auto;
+        line-height: 1.5;
+        font-size: 14px;
+    }
+</style>
