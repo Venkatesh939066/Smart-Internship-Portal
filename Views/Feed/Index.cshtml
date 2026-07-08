@@ -1,0 +1,670 @@
+@model IEnumerable<SmartInternshipPortal.Models.Post>
+@{
+    ViewData["Title"] = "Professional Feed";
+    var currentUser = ViewBag.CurrentUser as SmartInternshipPortal.Models.ApplicationUser;
+    var likedPostIds = ViewBag.LikedPostIds as List<int> ?? new List<int>();
+    var avatarInitial = string.IsNullOrWhiteSpace(currentUser?.FullName) ? "U" : currentUser.FullName.Trim()[0].ToString().ToUpper();
+}
+
+<div class="feed-container">
+    <div class="row g-4">
+        <!-- Left Sidebar: Profile Card -->
+        <div class="col-lg-3 d-none d-lg-block">
+            <div class="feed-profile-card">
+                <div class="feed-profile-banner"></div>
+                <div class="feed-profile-avatar-container">
+                    @if (currentUser != null && !string.IsNullOrEmpty(currentUser.ProfileImage))
+                    {
+                        <img src="@currentUser.ProfileImage" alt="Profile Picture" class="feed-profile-avatar-img" />
+                    }
+                    else
+                    {
+                        <div class="feed-profile-avatar-initial">@avatarInitial</div>
+                    }
+                </div>
+                <div class="feed-profile-info">
+                    <h4>@(currentUser?.FullName ?? "Welcome User")</h4>
+                    <p class="text-muted">@(currentUser?.ProfessionalTitle ?? (currentUser?.Role == "Company" ? "Verified Recruiter" : "Student Candidate"))</p>
+                    @if (currentUser?.Location != null)
+                    {
+                        <span class="location"><i class="bi bi-geo-alt"></i> @currentUser.Location</span>
+                    }
+                </div>
+                <hr />
+                <div class="feed-profile-stats">
+                    <div class="stat-row">
+                        <span>Role Type</span>
+                        <strong>@(currentUser?.Role ?? "User")</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Feed Column -->
+        <div class="col-lg-6 col-md-8 mx-auto">
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["ErrorMessage"]
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+
+            <!-- Create Post Box -->
+            <div class="create-post-card">
+                <div class="create-post-header">
+                    <div class="user-avatar-sm">
+                        @if (currentUser != null && !string.IsNullOrEmpty(currentUser.ProfileImage))
+                        {
+                            <img src="@currentUser.ProfileImage" alt="" />
+                        }
+                        else
+                        {
+                            <span>@avatarInitial</span>
+                        }
+                    </div>
+                    <span class="placeholder-text">Share an internship update, achievement, or project...</span>
+                </div>
+                <form asp-action="Create" method="post" enctype="multipart/form-data">
+                    @Html.AntiForgeryToken()
+                    <textarea name="content" class="post-textarea" placeholder="What's on your mind?" required></textarea>
+                    <div class="post-image-preview-container d-none" id="imagePreviewContainer">
+                        <img id="imagePreview" src="" alt="Selected Preview" class="post-image-preview" />
+                        <button type="button" class="btn-remove-preview" id="btnRemovePreview"><i class="bi bi-x-circle-fill"></i></button>
+                    </div>
+                    <div class="create-post-actions">
+                        <label class="btn-attach-image" for="postImageUpload">
+                            <i class="bi bi-image"></i> Media
+                            <input type="file" name="imageFile" id="postImageUpload" accept="image/*" class="d-none" />
+                        </label>
+                        <button type="submit" class="btn-post"><i class="bi bi-send"></i> Post</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Feed Posts List -->
+            @if (Model != null && Model.Any())
+            {
+                foreach (var post in Model)
+                {
+                    var hasLiked = likedPostIds.Contains(post.Id);
+                    var postAuthorInitial = string.IsNullOrWhiteSpace(post.Author.FullName) ? "U" : post.Author.FullName.Trim()[0].ToString().ToUpper();
+                    <div class="feed-post-card">
+                        <!-- Post Header -->
+                        <div class="post-card-header">
+                            <div class="user-avatar">
+                                @if (!string.IsNullOrEmpty(post.Author.ProfileImage))
+                                {
+                                    <img src="@post.Author.ProfileImage" alt="" />
+                                }
+                                else
+                                {
+                                    <span>@postAuthorInitial</span>
+                                }
+                            </div>
+                            <div class="post-author-details">
+                                <div class="d-flex align-items-center gap-2">
+                                    <h5 class="post-author-name">@post.Author.FullName</h5>
+                                    <span class="role-badge @post.Author.Role.ToLower()">@post.Author.Role</span>
+                                </div>
+                                <p class="post-author-title text-muted">@(post.Author.ProfessionalTitle ?? (post.Author.Role == "Company" ? "Recruiter" : "Candidate"))</p>
+                                <span class="post-timestamp text-muted">@post.CreatedAt.ToString("MMM dd, yyyy · hh:mm tt")</span>
+                            </div>
+                        </div>
+
+                        <!-- Post Body -->
+                        <div class="post-card-body">
+                            <p class="post-content">@post.Content</p>
+                            @if (!string.IsNullOrEmpty(post.ImageUrl))
+                            {
+                                <div class="post-media-container">
+                                    <img src="@post.ImageUrl" alt="Post attachment" class="post-media-image" />
+                                </div>
+                            }
+                        </div>
+
+                        <!-- Post Stats -->
+                        <div class="post-card-stats">
+                            <span class="likes-count"><i class="bi bi-hand-thumbs-up-fill text-primary"></i> @post.LikesCount @(post.LikesCount == 1 ? "like" : "likes")</span>
+                            <span class="comments-count">@post.Comments.Count @(post.Comments.Count == 1 ? "comment" : "comments")</span>
+                        </div>
+
+                        <hr class="m-0" />
+
+                        <!-- Action Buttons -->
+                        <div class="post-card-actions">
+                            <form asp-action="Like" method="post" class="w-50">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="postId" value="@post.Id" />
+                                <button type="submit" class="action-btn w-100 @(hasLiked ? "liked" : "")">
+                                    <i class="bi @(hasLiked ? "bi-hand-thumbs-up-fill" : "bi-hand-thumbs-up")"></i>
+                                    <span>Like</span>
+                                </button>
+                            </form>
+                            <button type="button" class="action-btn w-50 btn-comment-toggle" data-post-id="@post.Id">
+                                <i class="bi bi-chat-text"></i>
+                                <span>Comment</span>
+                            </button>
+                        </div>
+
+                        <!-- Comments Section -->
+                        <div class="post-comments-section @(post.Comments.Any() ? "" : "d-none")" id="commentsSection-@post.Id">
+                            <hr class="m-0 mb-3" />
+                            <!-- New Comment Input -->
+                            <form asp-action="Comment" method="post" class="comment-input-form mb-3">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="postId" value="@post.Id" />
+                                <div class="comment-input-wrapper">
+                                    <div class="user-avatar-sm">
+                                        @if (currentUser != null && !string.IsNullOrEmpty(currentUser.ProfileImage))
+                                        {
+                                            <img src="@currentUser.ProfileImage" alt="" />
+                                        }
+                                        else
+                                        {
+                                            <span>@avatarInitial</span>
+                                        }
+                                    </div>
+                                    <input type="text" name="content" placeholder="Write a comment..." class="comment-input" required />
+                                    <button type="submit" class="btn-comment-submit"><i class="bi bi-send-fill"></i></button>
+                                </div>
+                            </form>
+
+                            <!-- Comments List -->
+                            <div class="comments-list">
+                                @foreach (var comment in post.Comments.OrderByDescending(c => c.CreatedAt))
+                                {
+                                    var commentAuthorInitial = string.IsNullOrWhiteSpace(comment.Author.FullName) ? "U" : comment.Author.FullName.Trim()[0].ToString().ToUpper();
+                                    <div class="comment-item">
+                                        <div class="user-avatar-sm">
+                                            @if (!string.IsNullOrEmpty(comment.Author.ProfileImage))
+                                            {
+                                                <img src="@comment.Author.ProfileImage" alt="" />
+                                            }
+                                            else
+                                            {
+                                                <span>@commentAuthorInitial</span>
+                                            }
+                                        </div>
+                                        <div class="comment-content-bubble">
+                                            <div class="comment-header">
+                                                <div class="d-flex align-items-center gap-1">
+                                                    <strong>@comment.Author.FullName</strong>
+                                                    <span class="role-badge-sm @comment.Author.Role.ToLower()">@comment.Author.Role</span>
+                                                </div>
+                                                <span class="comment-time text-muted">@comment.CreatedAt.ToString("MMM dd · h:mm tt")</span>
+                                            </div>
+                                            <p class="comment-text mb-0">@comment.Content</p>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="empty-feed py-5 text-center">
+                    <div class="empty-feed-icon"><i class="bi bi-chat-quote"></i></div>
+                    <h3>No feed updates yet</h3>
+                    <p class="text-muted">Be the first to share an update, internship tips, or ask a question!</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Styling variables and CSS system for Feed */
+    .feed-container {
+        max-width: 1140px;
+        margin: 20px auto;
+        padding: 0 15px;
+    }
+
+    /* Left Profile Card */
+    .feed-profile-card {
+        background: #ffffff;
+        border-radius: 12px;
+        border: 1px solid rgba(148, 163, 184, 0.15);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+        position: sticky;
+        top: 20px;
+    }
+    .feed-profile-banner {
+        height: 70px;
+        background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+    }
+    .feed-profile-avatar-container {
+        text-align: center;
+        margin-top: -35px;
+        margin-bottom: 12px;
+    }
+    .feed-profile-avatar-img {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        border: 3px solid #ffffff;
+        object-fit: cover;
+    }
+    .feed-profile-avatar-initial {
+        width: 70px;
+        height: 70px;
+        border-radius: 50%;
+        border: 3px solid #ffffff;
+        background: #0284c7;
+        color: #ffffff;
+        font-size: 24px;
+        font-weight: bold;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .feed-profile-info {
+        text-align: center;
+        padding: 0 15px 15px;
+    }
+    .feed-profile-info h4 {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 700;
+        color: #1e293b;
+    }
+    .feed-profile-info p {
+        margin: 4px 0 8px;
+        font-size: 13px;
+    }
+    .feed-profile-info .location {
+        font-size: 12px;
+        color: #64748b;
+    }
+    .feed-profile-stats {
+        padding: 0 15px 15px;
+        font-size: 12px;
+    }
+    .stat-row {
+        display: flex;
+        justify-content: space-between;
+        color: #64748b;
+    }
+    .stat-row strong {
+        color: #0284c7;
+    }
+
+    /* Avatars */
+    .user-avatar, .user-avatar-sm {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background: #e2e8f0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        flex-shrink: 0;
+    }
+    .user-avatar img, .user-avatar-sm img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .user-avatar span, .user-avatar-sm span {
+        font-weight: bold;
+        color: #475569;
+        font-size: 16px;
+    }
+    .user-avatar-sm {
+        width: 32px;
+        height: 32px;
+    }
+    .user-avatar-sm span {
+        font-size: 12px;
+    }
+
+    /* Create Post Card */
+    .create-post-card {
+        background: #ffffff;
+        border-radius: 12px;
+        border: 1px solid rgba(148, 163, 184, 0.15);
+        padding: 16px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+    .create-post-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 12px;
+    }
+    .create-post-header .placeholder-text {
+        font-size: 14px;
+        color: #64748b;
+    }
+    .post-textarea {
+        width: 100%;
+        min-height: 80px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 12px;
+        font-size: 14px;
+        resize: none;
+        outline: none;
+        transition: border-color 0.2s;
+    }
+    .post-textarea:focus {
+        border-color: #0284c7;
+    }
+    .create-post-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 12px;
+    }
+    .btn-attach-image {
+        cursor: pointer;
+        padding: 8px 12px;
+        border-radius: 6px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        font-size: 13px;
+        color: #475569;
+        font-weight: 500;
+        transition: background 0.2s;
+    }
+    .btn-attach-image:hover {
+        background: #f1f5f9;
+        color: #0284c7;
+    }
+    .btn-post {
+        background: #0284c7;
+        color: #ffffff;
+        border: none;
+        padding: 8px 20px;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: background 0.2s;
+    }
+    .btn-post:hover {
+        background: #0369a1;
+    }
+
+    /* Preview Image */
+    .post-image-preview-container {
+        position: relative;
+        margin-top: 10px;
+        border-radius: 8px;
+        overflow: hidden;
+        max-height: 250px;
+    }
+    .post-image-preview {
+        width: 100%;
+        height: auto;
+        object-fit: cover;
+    }
+    .btn-remove-preview {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: none;
+        border: none;
+        color: #ef4444;
+        font-size: 20px;
+        cursor: pointer;
+    }
+
+    /* Post Card */
+    .feed-post-card {
+        background: #ffffff;
+        border-radius: 12px;
+        border: 1px solid rgba(148, 163, 184, 0.15);
+        padding: 16px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+    .post-card-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 12px;
+    }
+    .post-author-details h5 {
+        margin: 0;
+        font-size: 15px;
+        font-weight: 700;
+        color: #1e293b;
+    }
+    .post-author-title {
+        margin: 0;
+        font-size: 12px;
+    }
+    .post-timestamp {
+        font-size: 11px;
+    }
+    .role-badge, .role-badge-sm {
+        font-size: 10px;
+        font-weight: 600;
+        padding: 2px 6px;
+        border-radius: 12px;
+        text-transform: uppercase;
+    }
+    .role-badge.student, .role-badge-sm.student {
+        background: #e0f2fe;
+        color: #0369a1;
+    }
+    .role-badge.company, .role-badge-sm.company {
+        background: #dcfce7;
+        color: #15803d;
+    }
+    .role-badge.admin, .role-badge-sm.admin {
+        background: #f3e8ff;
+        color: #7e22ce;
+    }
+    .role-badge-sm {
+        font-size: 9px;
+        padding: 1px 4px;
+    }
+
+    .post-card-body {
+        margin-bottom: 12px;
+    }
+    .post-content {
+        font-size: 14px;
+        color: #334155;
+        white-space: pre-wrap;
+        line-height: 1.5;
+    }
+    .post-media-container {
+        border-radius: 8px;
+        overflow: hidden;
+        margin-top: 10px;
+        border: 1px solid #f1f5f9;
+    }
+    .post-media-image {
+        width: 100%;
+        max-height: 400px;
+        object-fit: cover;
+    }
+
+    .post-card-stats {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px 0;
+        font-size: 12px;
+        color: #64748b;
+    }
+
+    /* Actions */
+    .post-card-actions {
+        display: flex;
+        padding: 4px 0;
+    }
+    .action-btn {
+        background: none;
+        border: none;
+        padding: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        font-size: 13px;
+        font-weight: 600;
+        color: #475569;
+        cursor: pointer;
+        border-radius: 6px;
+        transition: background 0.2s, color 0.2s;
+    }
+    .action-btn:hover {
+        background: #f8fafc;
+        color: #0284c7;
+    }
+    .action-btn.liked {
+        color: #0284c7;
+    }
+
+    /* Comments Section */
+    .post-comments-section {
+        margin-top: 12px;
+    }
+    .comment-input-form {
+        margin-top: 12px;
+    }
+    .comment-input-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 20px;
+        padding: 4px 12px;
+    }
+    .comment-input {
+        flex-grow: 1;
+        background: none;
+        border: none;
+        outline: none;
+        font-size: 13px;
+        padding: 6px 0;
+        color: #334155;
+    }
+    .btn-comment-submit {
+        background: none;
+        border: none;
+        color: #0284c7;
+        font-size: 14px;
+        cursor: pointer;
+        padding: 4px;
+    }
+    .btn-comment-submit:hover {
+        color: #0369a1;
+    }
+
+    .comments-list {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        max-height: 300px;
+        overflow-y: auto;
+        padding-right: 5px;
+    }
+    .comment-item {
+        display: flex;
+        gap: 8px;
+        align-items: flex-start;
+    }
+    .comment-content-bubble {
+        background: #f1f5f9;
+        border-radius: 12px;
+        padding: 8px 12px;
+        flex-grow: 1;
+    }
+    .comment-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 4px;
+        font-size: 11px;
+    }
+    .comment-header strong {
+        font-size: 12px;
+        color: #1e293b;
+    }
+    .comment-time {
+        color: #94a3b8;
+    }
+    .comment-text {
+        font-size: 12px;
+        color: #334155;
+        line-height: 1.4;
+    }
+
+    /* Empty state */
+    .empty-feed {
+        background: #ffffff;
+        border-radius: 12px;
+        border: 1px solid rgba(148, 163, 184, 0.15);
+        padding: 40px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    }
+    .empty-feed-icon {
+        font-size: 48px;
+        color: #cbd5e1;
+        margin-bottom: 12px;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Comment Toggle
+        const toggleButtons = document.querySelectorAll('.btn-comment-toggle');
+        toggleButtons.forEach(btn => {
+            btn.addEventListener('click', function () {
+                const postId = this.getAttribute('data-post-id');
+                const section = document.getElementById(`commentsSection-${postId}`);
+                if (section) {
+                    section.classList.toggle('d-none');
+                }
+            });
+        });
+
+        // Image Attachment Preview
+        const imgInput = document.getElementById('postImageUpload');
+        const imgPreviewContainer = document.getElementById('imagePreviewContainer');
+        const imgPreview = document.getElementById('imagePreview');
+        const removeBtn = document.getElementById('btnRemovePreview');
+
+        if (imgInput) {
+            imgInput.addEventListener('change', function () {
+                const file = this.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        imgPreview.src = e.target.result;
+                        imgPreviewContainer.classList.remove('d-none');
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
+        if (removeBtn) {
+            removeBtn.addEventListener('click', function () {
+                imgInput.value = '';
+                imgPreview.src = '';
+                imgPreviewContainer.classList.add('d-none');
+            });
+        }
+    });
+</script>

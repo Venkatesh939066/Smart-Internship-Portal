@@ -1,0 +1,298 @@
+@using System.Text.Json
+@{
+    ViewData["Title"] = "Data Analytics Hub";
+    
+    // Serialize data for JS charts
+    var topSkillNamesJson = JsonSerializer.Serialize(ViewBag.TopSkillNames ?? new List<string>());
+    var topSkillCountsJson = JsonSerializer.Serialize(ViewBag.TopSkillCounts ?? new List<int>());
+    
+    var remoteCount = ViewBag.RemoteCount ?? 0;
+    var hybridCount = ViewBag.HybridCount ?? 0;
+    var onsiteCount = ViewBag.OnSiteCount ?? 0;
+}
+
+<div class="container-fluid py-4">
+    <div class="row mb-4 align-items-center">
+        <div class="col">
+            <h1 class="h2 mb-1 text-white font-weight-bold">📊 Data Analytics Hub</h1>
+            <p class="text-muted">Real-time job market intelligence generated from automated ETL pipelines.</p>
+        </div>
+        <div class="col-auto">
+            <a href="http://localhost:8501" target="_blank" class="btn btn-primary d-flex align-items-center gap-2">
+                <i class="bi bi-rocket-takeoff-fill"></i> Launch Streamlit Dashboard
+            </a>
+        </div>
+    </div>
+
+    <!-- Dynamic KPI Card Section -->
+    <div class="row mb-4">
+        <!-- KPI 1 -->
+        <div class="col-md-4 mb-3">
+            <div class="card bg-dark text-white border-secondary h-100 shadow-sm glass-card">
+                <div class="card-body d-flex align-items-center">
+                    <div class="p-3 bg-primary rounded-3 me-3 text-white">
+                        <i class="bi bi-briefcase-fill fs-2"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-uppercase text-muted mb-1 fs-7">Active Internships</h6>
+                        <h2 class="mb-0 font-weight-bold">@ViewBag.TotalInternships</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- KPI 2 -->
+        <div class="col-md-4 mb-3">
+            <div class="card bg-dark text-white border-secondary h-100 shadow-sm glass-card">
+                <div class="card-body d-flex align-items-center">
+                    <div class="p-3 bg-success rounded-3 me-3 text-white">
+                        <i class="bi bi-building fs-2"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-uppercase text-muted mb-1 fs-7">Active Recruiters</h6>
+                        <h2 class="mb-0 font-weight-bold">@ViewBag.TotalCompanies</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- KPI 3 -->
+        <div class="col-md-4 mb-3">
+            <div class="card bg-dark text-white border-secondary h-100 shadow-sm glass-card">
+                <div class="card-body d-flex align-items-center">
+                    <div class="p-3 bg-info rounded-3 me-3 text-white">
+                        <i class="bi bi-tools fs-2"></i>
+                    </div>
+                    <div>
+                        <h6 class="text-uppercase text-muted mb-1 fs-7">Technical Skills Mapped</h6>
+                        <h2 class="mb-0 font-weight-bold">@ViewBag.TotalSkills</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="row mb-5">
+        <div class="col-lg-6 mb-4">
+            <div class="card bg-dark border-secondary h-100 shadow-sm">
+                <div class="card-header bg-transparent border-secondary py-3">
+                    <h5 class="card-title text-white mb-0"><i class="bi bi-bar-chart-line-fill me-2 text-primary"></i>Top Demanded Skills</h5>
+                </div>
+                <div class="card-body d-flex justify-content-center align-items-center" style="min-height: 300px;">
+                    <canvas id="skillsChart" style="max-height: 280px; width: 100%;"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 mb-4">
+            <div class="card bg-dark border-secondary h-100 shadow-sm">
+                <div class="card-header bg-transparent border-secondary py-3">
+                    <h5 class="card-title text-white mb-0"><i class="bi bi-pie-chart-fill me-2 text-success"></i>Work Mode Distribution</h5>
+                </div>
+                <div class="card-body d-flex justify-content-center align-items-center" style="min-height: 300px;">
+                    <canvas id="remoteChart" style="max-height: 280px; width: 100%;"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Data Engineering Architectural Panel -->
+    <div class="card bg-dark border-secondary shadow-sm mb-4">
+        <div class="card-header bg-transparent border-secondary py-3">
+            <h4 class="card-title text-white mb-0"><i class="bi bi-gear-wide-connected me-2 text-info animate-spin"></i>Data Engineering Architecture (ETL & BI)</h4>
+        </div>
+        <div class="card-body text-white">
+            <p class="text-muted">
+                This project represents a production-style Data Engineering workflow. Rather than manually inputting job data, a scheduled ingestion script parses unstructured job feeds, normalizes schema entries, inserts records into the production database, and publishes visual analysis to internal/external Business Intelligence applications.
+            </p>
+            
+            <!-- Ingestion Workflow Diagram -->
+            <div class="bg-black p-4 rounded-3 mb-4 text-center border border-secondary">
+                <div class="row align-items-center text-center">
+                    <div class="col-md-2 mb-3 mb-md-0">
+                        <div class="p-2 border border-secondary rounded bg-dark">
+                            <i class="bi bi-filetype-json fs-1 text-warning"></i>
+                            <h6 class="mt-2 mb-0">Raw Ingest</h6>
+                            <small class="text-muted">mock_source.json</small>
+                        </div>
+                    </div>
+                    <div class="col-md-1 mb-3 mb-md-0">
+                        <i class="bi bi-arrow-right fs-2 text-secondary"></i>
+                    </div>
+                    <div class="col-md-3 mb-3 mb-md-0">
+                        <div class="p-2 border border-secondary rounded bg-dark">
+                            <i class="bi bi-cpu-fill fs-1 text-primary"></i>
+                            <h6 class="mt-2 mb-0">ETL Worker</h6>
+                            <small class="text-muted">etl_pipeline.py (Pandas)</small>
+                        </div>
+                    </div>
+                    <div class="col-md-1 mb-3 mb-md-0">
+                        <i class="bi bi-arrow-right fs-2 text-secondary"></i>
+                    </div>
+                    <div class="col-md-2 mb-3 mb-md-0">
+                        <div class="p-2 border border-secondary rounded bg-dark">
+                            <i class="bi bi-database-fill-gear fs-1 text-success"></i>
+                            <h6 class="mt-2 mb-0">SQLite Engine</h6>
+                            <small class="text-muted">app.db (Storage)</small>
+                        </div>
+                    </div>
+                    <div class="col-md-1 mb-3 mb-md-0">
+                        <i class="bi bi-arrow-right fs-2 text-secondary"></i>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="p-2 border border-secondary rounded bg-dark">
+                            <i class="bi bi-display-fill fs-1 text-info"></i>
+                            <h6 class="mt-2 mb-0">BI Analytics</h6>
+                            <small class="text-muted">Streamlit & MVC UI</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detailed steps and code execution instructions -->
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <h5 class="text-info border-bottom border-secondary pb-2 mb-3">🚀 Execute Ingestion Locally</h5>
+                    <p>To run the pipeline and update the database, execute these commands in your console:</p>
+                    <div class="bg-black p-3 rounded border border-secondary text-monospace mb-3">
+                        <span class="text-success"># 1. Install dependencies</span><br/>
+                        pip install -r data_pipeline/requirements.txt<br/><br/>
+                        <span class="text-success"># 2. Run Ingestion Pipeline</span><br/>
+                        python data_pipeline/etl_pipeline.py<br/><br/>
+                        <span class="text-success"># 3. Launch the BI Dashboard</span><br/>
+                        streamlit run data_pipeline/dashboard.py
+                    </div>
+                    <p class="text-muted small">
+                        Note: The ETL pipeline writes data directly into the shared sqlite database (<code>app.db</code>). When you run the Python ETL script, the list of jobs under <b>Browse Jobs</b> inside the portal updates immediately!
+                    </p>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <h5 class="text-info border-bottom border-secondary pb-2 mb-3">📄 Unstructured Feed Sample Schema</h5>
+                    <p>The raw mock feed contains dirty columns, HTML tags, and messy formats:</p>
+                    <pre class="bg-black text-warning p-3 rounded border border-secondary mb-0" style="max-height: 275px; overflow-y: auto; font-size: 0.85rem;">[
+  {
+    "Title": "Data Engineer Intern",
+    "CompanyName": "Tata Digital",
+    "Description": "&lt;p&gt;We are looking for an Intern... &lt;b&gt;Python&lt;/b&gt;, &lt;b&gt;SQL&lt;/b&gt;, and &lt;b&gt;Spark&lt;/b&gt;&lt;/p&gt;",
+    "Location": "Bengaluru, India",
+    "PostedDate": "2026-06-27T08:30:00Z",
+    "Salary": "INR 25,000 / month",
+    "JobType": "Internship",
+    "RemoteType": "hybrid",
+    "ExperienceLevel": "0-1 Years"
+  }
+]</pre>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    body {
+        background-color: #121824 !important;
+    }
+    .glass-card {
+        background: rgba(31, 41, 55, 0.45) !important;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    }
+    .text-monospace {
+        font-family: 'Courier New', Courier, monospace;
+        font-size: 0.9rem;
+    }
+    .fs-7 {
+        font-size: 0.8rem;
+    }
+</style>
+
+@section Scripts {
+    <!-- Include Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Data mapping from backend ViewBag
+            const skillNames = @Html.Raw(topSkillNamesJson);
+            const skillCounts = @Html.Raw(topSkillCountsJson);
+
+            const remoteCount = @remoteCount;
+            const hybridCount = @hybridCount;
+            const onsiteCount = @onsiteCount;
+
+            // 1. Skill Demand Chart
+            const skillsCtx = document.getElementById('skillsChart').getContext('2d');
+            new Chart(skillsCtx, {
+                type: 'bar',
+                data: {
+                    labels: skillNames,
+                    datasets: [{
+                        label: 'Job Postings',
+                        data: skillCounts,
+                        backgroundColor: [
+                            'rgba(54, 162, 235, 0.75)',
+                            'rgba(75, 192, 192, 0.75)',
+                            'rgba(153, 102, 255, 0.75)',
+                            'rgba(255, 159, 64, 0.75)',
+                            'rgba(255, 99, 132, 0.75)',
+                            'rgba(201, 203, 207, 0.75)'
+                        ],
+                        borderColor: [
+                            'rgb(54, 162, 235)',
+                            'rgb(75, 192, 192)',
+                            'rgb(153, 102, 255)',
+                            'rgb(255, 159, 64)',
+                            'rgb(255, 99, 132)',
+                            'rgb(201, 203, 207)'
+                        ],
+                        borderWidth: 1.5,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    indexAxis: 'y', // Makes it horizontal
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                            ticks: { color: '#9ca3af', stepSize: 1 }
+                        },
+                        y: {
+                            grid: { display: false },
+                            ticks: { color: '#ffffff', font: { weight: 'bold' } }
+                        }
+                    }
+                }
+            });
+
+            // 2. Remote Work Mode Chart
+            const remoteCtx = document.getElementById('remoteChart').getContext('2d');
+            new Chart(remoteCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Remote', 'Hybrid', 'On-site'],
+                    datasets: [{
+                        data: [remoteCount, hybridCount, onsiteCount],
+                        backgroundColor: [
+                            'rgba(16, 185, 129, 0.8)', // Green
+                            'rgba(245, 158, 11, 0.8)', // Orange/Yellow
+                            'rgba(59, 130, 246, 0.8)'  // Blue
+                        ],
+                        borderColor: '#1f2937',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { color: '#ffffff', font: { size: 12 } }
+                        }
+                    },
+                    cutout: '60%'
+                }
+            });
+        });
+    </script>
+}

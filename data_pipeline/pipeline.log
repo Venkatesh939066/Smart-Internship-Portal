@@ -1,0 +1,34 @@
+2026-06-28 15:31:20,762 [INFO] --- Data Ingestion & ETL Pipeline Started ---
+2026-06-28 15:31:20,766 [INFO] Connected to SQLite Database: C:\Users\Venkatesh\OneDrive\Desktop\Smart Internship Portal\app.db
+2026-06-28 15:31:20,777 [INFO] Extracted 10 raw listings from mock_source.json
+2026-06-28 15:31:20,795 [INFO] Found 37 seeded companies in database.
+2026-06-28 15:31:20,795 [INFO] Found 13 existing skills in database.
+2026-06-28 15:31:20,801 [INFO] Inserted new internship: 'Data Engineer Intern' (ID: 43)
+2026-06-28 15:31:20,803 [INFO] Inserted new internship: 'Junior Data Analyst' (ID: 44)
+2026-06-28 15:31:20,805 [INFO] Inserted new internship: 'Backend Developer Intern (C#/.NET)' (ID: 45)
+2026-06-28 15:31:20,806 [INFO] Inserted new internship: 'Machine Learning Engineer Intern' (ID: 46)
+2026-06-28 15:31:20,807 [INFO] Inserted new internship: 'Frontend Engineer Intern (React)' (ID: 47)
+2026-06-28 15:31:20,808 [INFO] Inserted new internship: 'UI/UX Designer Intern' (ID: 48)
+2026-06-28 15:31:20,809 [INFO] Inserted new internship: 'Cloud Data Engineer (Spark/Azure)' (ID: 49)
+2026-06-28 15:31:20,810 [INFO] Inserted new internship: 'Full Stack Web Developer Intern' (ID: 50)
+2026-06-28 15:31:20,811 [INFO] Inserted new internship: 'Project Management Intern' (ID: 51)
+2026-06-28 15:31:20,812 [INFO] Inserted new internship: 'Data Infrastructure Engineer' (ID: 52)
+2026-06-28 15:31:20,816 [INFO] --- Ingestion Pipeline Finished ---
+2026-06-28 15:31:20,816 [INFO] Summary: Loaded 10 new postings, Updated 0 postings, Errors: 0
+2026-06-28 15:31:28,846 [INFO] --- Data Ingestion & ETL Pipeline Started ---
+2026-06-28 15:31:28,851 [INFO] Connected to SQLite Database: C:\Users\Venkatesh\OneDrive\Desktop\Smart Internship Portal\app.db
+2026-06-28 15:31:28,857 [INFO] Extracted 10 raw listings from mock_source.json
+2026-06-28 15:31:28,859 [INFO] Found 37 seeded companies in database.
+2026-06-28 15:31:28,859 [INFO] Found 13 existing skills in database.
+2026-06-28 15:31:28,864 [INFO] Updated internship: 'Data Engineer Intern' by company ID a69189b7-c4b0-4155-a5d2-07d10086dba1
+2026-06-28 15:31:28,867 [INFO] Updated internship: 'Junior Data Analyst' by company ID 9aa9dffb-d31c-492e-baa9-eed4e84b5ea8
+2026-06-28 15:31:28,868 [INFO] Updated internship: 'Backend Developer Intern (C#/.NET)' by company ID 9117a574-e53b-4893-b333-cbd058ae0de3
+2026-06-28 15:31:28,870 [INFO] Updated internship: 'Machine Learning Engineer Intern' by company ID 903e87b5-dfb4-4bed-a8b3-8d42d4db3816
+2026-06-28 15:31:28,872 [INFO] Updated internship: 'Frontend Engineer Intern (React)' by company ID 0938e840-722a-43b8-887d-1c3f2d842794
+2026-06-28 15:31:28,872 [INFO] Updated internship: 'UI/UX Designer Intern' by company ID 2e5d5173-6528-44c4-b9fc-adb7009b0d47
+2026-06-28 15:31:28,873 [INFO] Updated internship: 'Cloud Data Engineer (Spark/Azure)' by company ID a69189b7-c4b0-4155-a5d2-07d10086dba1
+2026-06-28 15:31:28,874 [INFO] Updated internship: 'Full Stack Web Developer Intern' by company ID 4a33d74a-c2ef-4334-88c9-d200cf280327
+2026-06-28 15:31:28,876 [INFO] Updated internship: 'Project Management Intern' by company ID 9aa9dffb-d31c-492e-baa9-eed4e84b5ea8
+2026-06-28 15:31:28,876 [INFO] Updated internship: 'Data Infrastructure Engineer' by company ID 903e87b5-dfb4-4bed-a8b3-8d42d4db3816
+2026-06-28 15:31:28,881 [INFO] --- Ingestion Pipeline Finished ---
+2026-06-28 15:31:28,881 [INFO] Summary: Loaded 0 new postings, Updated 10 postings, Errors: 0

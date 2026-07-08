@@ -1,0 +1,304 @@
+@model SmartInternshipPortal.Models.Internship
+@using System.Linq
+
+@{
+    ViewData["Title"] = "Review Candidates";
+    var applicants = ViewBag.Applicants as IEnumerable<dynamic>;
+}
+
+<div class="dashboard-wrapper">
+    <!-- Header Block -->
+    <div class="dashboard-header-card">
+        <div class="header-text">
+            <h1>Candidates for: @Model.Title 👥</h1>
+            <p>Review student applications. Candidates are sorted by their smart match percentage based on required skills.</p>
+        </div>
+        <div class="header-actions">
+            <a asp-action="Index" class="btn-secondary-custom">🔙 Back to Workspace</a>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert-custom success mb-4">
+            <span>🎉 @TempData["SuccessMessage"]</span>
+        </div>
+    }
+
+    <!-- Required Skills Info -->
+    <div class="info-card-custom mb-4">
+        <h4>🎯 Core Required Skills:</h4>
+        <div class="skill-pills mt-2">
+            @foreach (var isk in Model.InternshipSkills)
+            {
+                <span class="skill-pill-large">@isk.Skill.Name</span>
+            }
+            @if (!Model.InternshipSkills.Any())
+            {
+                <span class="text-muted">No specific skills listed. Candidates will show 100% baseline match.</span>
+            }
+        </div>
+    </div>
+
+    <!-- Smart Filters (Pipeline Stages) -->
+    <div class="pipeline-tabs-wrapper mb-3">
+        <button type="button" class="pipeline-tab active" data-filter="all">All Applicants (@(applicants?.Count() ?? 0))</button>
+        <button type="button" class="pipeline-tab" data-filter="excellent">Excellent Match (>=80%)</button>
+        <button type="button" class="pipeline-tab" data-filter="good">Good Match (>=50%)</button>
+        <button type="button" class="pipeline-tab" data-filter="pending">Pending Review</button>
+        <button type="button" class="pipeline-tab" data-filter="accepted">Hired / Accepted</button>
+        <button type="button" class="pipeline-tab" data-filter="rejected">Rejected</button>
+    </div>
+
+    <!-- Applicants List -->
+    <div class="widget-card">
+        <div class="widget-header">
+            <h2>Applicant Log</h2>
+        </div>
+        <div class="widget-body">
+            @if (applicants != null && applicants.Any())
+            {
+                <div class="table-responsive-custom">
+                    <table class="table-custom" id="applicantsTable">
+                        <thead>
+                            <tr>
+                                <th>Candidate Details</th>
+                                <th>Skills Alignment</th>
+                                <th>Match Score</th>
+                                <th>Applied Date</th>
+                                <th>Status</th>
+                                <th>Quick Actions</th>
+                                <th>Review Decisions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in applicants)
+                            {
+                                var app = item.Application;
+                                int score = item.MatchScore;
+                                var statusClass = app.Status.ToLower();
+                                var scoreCategory = score >= 80 ? "excellent" : score >= 50 ? "good" : "standard";
+                                
+                                <tr class="applicant-row" 
+                                    data-score="@score" 
+                                    data-score-category="@scoreCategory" 
+                                    data-status="@statusClass">
+                                    <td>
+                                        <strong>@app.Student.FullName</strong>
+                                        <div class="text-xs text-muted">@app.Student.Email</div>
+                                        <div class="text-xs text-muted mt-1">@app.Student.College</div>
+                                    </td>
+                                    <td>
+                                        <div class="skill-pills">
+                                            @foreach (var us in app.Student.UserSkills)
+                                            {
+                                                <span class="skill-pill-active-sm">@us.Skill.Name</span>
+                                            }
+                                            @if (app.Student.UserSkills.Count == 0)
+                                            {
+                                                <span class="text-muted text-xs">No skills selected</span>
+                                            }
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="match-badge-pill" style="--match-score-color: @(score >= 80 ? "#10B981" : score >= 50 ? "#F59E0B" : "#EF4444")">
+                                            @score%
+                                        </span>
+                                    </td>
+                                    <td>@app.AppliedDate.ToString("yyyy-MM-dd")</td>
+                                    <td>
+                                        @if (app.Status == "Pending")
+                                        {
+                                            <span class="badge-status pending">⏳ Pending</span>
+                                        }
+                                        else if (app.Status == "Accepted")
+                                        {
+                                            <span class="badge-status accepted">✅ Accepted</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge-status rejected">❌ Rejected</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <div class="d-flex flex-column gap-1">
+                                            <a asp-controller="Message" asp-action="Index" asp-route-withUserId="@app.StudentId" class="btn-chat-action text-decoration-none">
+                                                <i class="bi bi-chat-dots-fill"></i> Chat
+                                            </a>
+                                            <a asp-controller="Student" asp-action="ExportResume" asp-route-id="@app.StudentId" target="_blank" class="btn-resume-action text-decoration-none">
+                                                <i class="bi bi-file-pdf-fill"></i> Resume
+                                            </a>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        @if (app.Status == "Pending")
+                                        {
+                                            <div class="decision-actions">
+                                                <form asp-action="UpdateStatus" method="post" class="d-inline-form">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="applicationId" value="@app.Id" />
+                                                    <input type="hidden" name="status" value="Accepted" />
+                                                    <textarea name="companyFeedback" rows="1" class="form-control-sm-custom mb-1" placeholder="Add acceptance note..." required></textarea>
+                                                    <button type="submit" class="btn-action-accept-sm">Hire</button>
+                                                </form>
+                                                <form asp-action="UpdateStatus" method="post" class="d-inline-form mt-1">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="applicationId" value="@app.Id" />
+                                                    <input type="hidden" name="status" value="Rejected" />
+                                                    <textarea name="companyFeedback" rows="1" class="form-control-sm-custom mb-1" placeholder="Rejection reason..." required></textarea>
+                                                    <button type="submit" class="btn-action-reject-sm">Reject</button>
+                                                </form>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="text-xs text-muted">
+                                                <strong>Decision Note:</strong><br />
+                                                <span class="text-italic">@(string.IsNullOrEmpty(app.CompanyFeedback) ? "No feedback given" : app.CompanyFeedback)</span>
+                                            </div>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="empty-state py-5 text-center">
+                    <h3>👋 No candidates have applied yet</h3>
+                    <p>Wait for students with matching skills to view and apply for this role.</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Styling pipeline and quick actions */
+    .pipeline-tabs-wrapper {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        background: #f8fafc;
+        padding: 6px;
+        border-radius: 8px;
+        border: 1px solid rgba(148, 163, 184, 0.15);
+    }
+    .pipeline-tab {
+        background: none;
+        border: none;
+        padding: 6px 12px;
+        font-size: 13px;
+        font-weight: 600;
+        color: #64748b;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .pipeline-tab:hover {
+        background: #f1f5f9;
+        color: #1e293b;
+    }
+    .pipeline-tab.active {
+        background: #0284c7;
+        color: #ffffff;
+    }
+
+    .form-control-sm-custom {
+        width: 100%;
+        font-size: 11px;
+        padding: 4px 6px;
+        border-radius: 4px;
+        border: 1px solid #e2e8f0;
+        resize: none;
+    }
+
+    .btn-action-accept-sm, .btn-action-reject-sm {
+        width: 100%;
+        border: none;
+        padding: 4px 8px;
+        font-size: 11px;
+        font-weight: 600;
+        border-radius: 4px;
+        color: #ffffff;
+    }
+    .btn-action-accept-sm {
+        background: #10b981;
+    }
+    .btn-action-accept-sm:hover {
+        background: #059669;
+    }
+    .btn-action-reject-sm {
+        background: #ef4444;
+    }
+    .btn-action-reject-sm:hover {
+        background: #dc2626;
+    }
+
+    .btn-chat-action, .btn-resume-action {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 12px;
+        font-weight: 600;
+        padding: 4px 8px;
+        border-radius: 4px;
+        width: fit-content;
+    }
+    .btn-chat-action {
+        background: #e0f2fe;
+        color: #0369a1;
+    }
+    .btn-chat-action:hover {
+        background: #bae6fd;
+    }
+    .btn-resume-action {
+        background: #f1f5f9;
+        color: #475569;
+    }
+    .btn-resume-action:hover {
+        background: #e2e8f0;
+    }
+
+    .text-italic {
+        font-style: italic;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const tabs = document.querySelectorAll('.pipeline-tab');
+        const rows = document.querySelectorAll('.applicant-row');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', function () {
+                tabs.forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+
+                const filter = this.getAttribute('data-filter');
+
+                rows.forEach(row => {
+                    const score = parseInt(row.getAttribute('data-score'));
+                    const scoreCategory = row.getAttribute('data-score-category');
+                    const status = row.getAttribute('data-status');
+
+                    if (filter === 'all') {
+                        row.style.display = '';
+                    } else if (filter === 'excellent') {
+                        row.style.display = scoreCategory === 'excellent' ? '' : 'none';
+                    } else if (filter === 'good') {
+                        row.style.display = (scoreCategory === 'excellent' || scoreCategory === 'good') ? '' : 'none';
+                    } else if (filter === 'pending') {
+                        row.style.display = status === 'pending' ? '' : 'none';
+                    } else if (filter === 'accepted') {
+                        row.style.display = status === 'accepted' ? '' : 'none';
+                    } else if (filter === 'rejected') {
+                        row.style.display = status === 'rejected' ? '' : 'none';
+                    }
+                });
+            });
+        });
+    });
+</script>

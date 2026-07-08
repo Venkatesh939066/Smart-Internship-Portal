@@ -1,0 +1,123 @@
+@model IEnumerable<SmartInternshipPortal.Models.Internship>
+@{
+    ViewData["Title"] = "Company Workspace";
+}
+
+<div class="dashboard-wrapper">
+    <div class="dashboard-hero">
+        <div class="dashboard-hero-content">
+            <span class="dashboard-hero-badge"><i class="bi bi-building"></i> Company Workspace</span>
+            <h1>Manage Your Internships</h1>
+            <p>Post positions, define required skills, and review candidates ranked by skill compatibility.</p>
+        </div>
+        <div class="header-actions">
+            <a asp-action="Profile" class="btn-secondary-custom"><i class="bi bi-pencil"></i> Edit Profile</a>
+            <a asp-action="Create" class="btn-primary-custom"><i class="bi bi-plus-lg"></i> Post Internship</a>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert-custom success">
+            <i class="bi bi-check-circle me-2"></i> @TempData["SuccessMessage"]
+        </div>
+    }
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon"><i class="bi bi-briefcase"></i></div>
+            <div class="stat-content">
+                <h3>@ViewBag.TotalJobs</h3>
+                <p>Positions Posted</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon"><i class="bi bi-people"></i></div>
+            <div class="stat-content">
+                <h3>@ViewBag.TotalApplications</h3>
+                <p>Total Applications</p>
+            </div>
+        </div>
+        <div class="stat-card pending">
+            <div class="stat-icon"><i class="bi bi-hourglass-split"></i></div>
+            <div class="stat-content">
+                <h3>@ViewBag.PendingReviews</h3>
+                <p>Pending Reviews</p>
+                @if (ViewBag.PendingReviews > 0)
+                {
+                    <span class="stat-trend up">Needs attention</span>
+                }
+            </div>
+        </div>
+    </div>
+
+    <div class="widget-card">
+        <div class="widget-header">
+            <h2><i class="bi bi-list-ul"></i> Active Internship Postings</h2>
+            <a asp-action="Create" class="btn-sm-custom"><i class="bi bi-plus"></i> New Posting</a>
+        </div>
+        <div class="widget-body">
+            @if (Model != null && Model.Any())
+            {
+                <div class="table-responsive-custom">
+                    <table class="table-custom">
+                        <thead>
+                            <tr>
+                                <th>Title</th>
+                                <th>Location</th>
+                                <th>Skills</th>
+                                <th>Posted</th>
+                                <th>Applicants</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var job in Model)
+                            {
+                                <tr>
+                                    <td><strong>@job.Title</strong></td>
+                                    <td><i class="bi bi-geo-alt text-muted"></i> @job.Location</td>
+                                    <td>
+                                        <div class="skill-pills">
+                                            @foreach (var isk in job.InternshipSkills)
+                                            {
+                                                <span class="skill-pill">@isk.Skill.Name</span>
+                                            }
+                                        </div>
+                                    </td>
+                                    <td>@job.PostedDate.ToString("MMM dd, yyyy")</td>
+                                    <td>
+                                        <span class="badge-accent">@job.Applications.Count</span>
+                                        @if (job.Applications.Any(a => a.Status == "Pending"))
+                                        {
+                                            <span class="pending-dot" title="Pending reviews"></span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <div class="table-actions">
+                                            <a asp-action="Edit" asp-route-id="@job.Id" class="btn-sm-custom">
+                                                <i class="bi bi-pencil"></i> Edit
+                                            </a>
+                                            <a asp-action="Applicants" asp-route-id="@job.Id" class="btn-sm-custom">
+                                                <i class="bi bi-people"></i> Candidates
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="empty-state">
+                    <div class="empty-state-icon"><i class="bi bi-megaphone"></i></div>
+                    <h3 style="margin-bottom: 0.5rem; color: var(--text-main);">No internships posted yet</h3>
+                    <p>Create your first posting to start attracting top talent.</p>
+                    <a asp-action="Create" class="btn-primary-custom mt-3"><i class="bi bi-plus-lg"></i> Post First Internship</a>
+                </div>
+            }
+        </div>
+    </div>
+</div>

@@ -1,0 +1,122 @@
+[
+  {
+    "Title": "Data Engineer Intern",
+    "CompanyName": "Tata Digital",
+    "Description": "<p>We are looking for a Data Engineer Intern to join our data platform team. You will build and scale data pipelines using <b>Python</b>, <b>SQL</b>, and <b>Spark</b>. Exposure to <i>Azure</i> cloud data lake services (ADLS, Synapse) is a big plus.</p><ul><li>Design and model schema</li><li>Write SQL queries</li></ul>",
+    "Location": "Bengaluru, India",
+    "PostedDate": "2026-06-27T08:30:00Z",
+    "Salary": "INR 25,000 / month",
+    "JobType": "Internship",
+    "RemoteType": "hybrid",
+    "ExperienceLevel": "0-1 Years",
+    "ApplyUrl": "https://careers.tatadigital.com/jobs/de-intern-101"
+  },
+  {
+    "Title": "Junior Data Analyst",
+    "CompanyName": "Infosys Labs",
+    "Description": "Join us as a Junior Data Analyst. Requirements: Proficient in writing raw <b>SQL</b> queries and building dashboards in <b>Power BI</b>. Experience with <b>Python</b> (Pandas) for data wrangling is desired.",
+    "Location": "Pune, India",
+    "PostedDate": "2026/06/25",
+    "Salary": "15,000 - 20,000 INR per month",
+    "JobType": "Internship",
+    "RemoteType": "wfh",
+    "ExperienceLevel": "Freshers",
+    "ApplyUrl": "https://careers.infosys.com/labs/data-analyst"
+  },
+  {
+    "Title": "Backend Developer Intern (C#/.NET)",
+    "CompanyName": "Microsoft",
+    "Description": "We are seeking a Backend Developer Intern. You will work on microservices using <b>C#</b> and <b>ASP.NET Core</b>. Database interaction is managed through Entity Framework and <b>SQL</b> databases. Knowing <i>React</i> is beneficial.",
+    "Location": "Hyderabad, India",
+    "PostedDate": "Jun 24, 2026",
+    "Salary": "$1,200 / month",
+    "JobType": "Internship",
+    "RemoteType": "Hybrid",
+    "ExperienceLevel": "0-1 years",
+    "ApplyUrl": "https://careers.microsoft.com/jobs/backend-dotnet"
+  },
+  {
+    "Title": "Machine Learning Engineer Intern",
+    "CompanyName": "Google",
+    "Description": "<p>Google is hiring a Machine Learning Intern. Work on deep learning models using <b>Python</b>. You must be skilled in SQL, PyTorch, and <b>Machine Learning</b> algorithms.</p>",
+    "Location": "Bengaluru",
+    "PostedDate": "2026-06-28T12:00:00Z",
+    "Salary": "$2,000 USD/month",
+    "JobType": "Internship",
+    "RemoteType": "Onsite",
+    "ExperienceLevel": "Masters / PhD preferred",
+    "ApplyUrl": "https://careers.google.com/jobs/ml-intern"
+  },
+  {
+    "Title": "Frontend Engineer Intern (React)",
+    "CompanyName": "Meta",
+    "Description": "Meta's UI team is looking for a Frontend Intern! Work with modern UI paradigms using <b>React</b>, <b>JavaScript</b>, and <b>HTML & CSS</b>. Create elegant user interfaces and ensure cross-browser compatibility.",
+    "Location": "Remote, USA",
+    "PostedDate": "2026-06-26T14:45:00Z",
+    "Salary": "None",
+    "JobType": "Internship",
+    "RemoteType": "Remote",
+    "ExperienceLevel": "Undergraduates",
+    "ApplyUrl": "https://metacareers.com/internships/frontend-react"
+  },
+  {
+    "Title": "UI/UX Designer Intern",
+    "CompanyName": "Apple",
+    "Description": "Design the next generation of application interfaces! The role requires strong expertise in <b>UI/UX Design</b> tools, wireframing, prototyping, and understanding user behaviors. Basic <b>HTML & CSS</b> is preferred.",
+    "Location": "Hyderabad",
+    "PostedDate": "2026/06/20",
+    "Salary": "$1,500 - $1,800/month",
+    "JobType": "Internship",
+    "RemoteType": "in-office",
+    "ExperienceLevel": "Portfolio required",
+    "ApplyUrl": "https://apple.com/careers/ui-ux-design"
+  },
+  {
+    "Title": "Cloud Data Engineer (Spark/Azure)",
+    "CompanyName": "Tata Digital",
+    "Description": "<p>Accelerate our data lake initiative using <b>Spark</b>, <b>Python</b>, and cloud storage on <b>Azure</b>. Optimize complex <b>SQL</b> data warehouses and orchestrate data jobs.</p>",
+    "Location": "Mumbai, India",
+    "PostedDate": "Jun 22, 2026",
+    "Salary": "INR 30,000",
+    "JobType": "Full-time",
+    "RemoteType": "Remote",
+    "ExperienceLevel": "1+ Year",
+    "ApplyUrl": "https://careers.tatadigital.com/jobs/cloud-de"
+  },
+  {
+    "Title": "Full Stack Web Developer Intern",
+    "CompanyName": "Netflix",
+    "Description": "Netflix is seeking a Full Stack Intern. Technologies used include <b>JavaScript</b>, <b>React</b>, Node.js, and <b>SQL</b> backend. Familiarity with cloud platforms is a plus.",
+    "Location": "Los Gatos, CA",
+    "PostedDate": "2026-06-23T11:15:00Z",
+    "Salary": "$2500 per month",
+    "JobType": "Internship",
+    "RemoteType": "hybrid-mode",
+    "ExperienceLevel": "0-1 years",
+    "ApplyUrl": "https://netflix.com/careers/full-stack-intern"
+  },
+  {
+    "Title": "Project Management Intern",
+    "CompanyName": "Infosys Labs",
+    "Description": "Assist our software engineering groups with Scrum management, task tracking, and sprint planning. Candidate should understand <b>Project Management</b> principles, Agile frameworks, and JIRA.",
+    "Location": "Bangalore",
+    "PostedDate": "2026-06-21",
+    "Salary": "12000 INR",
+    "JobType": "Internship",
+    "RemoteType": "wfh",
+    "ExperienceLevel": "MBA / Business graduates",
+    "ApplyUrl": "https://careers.infosys.com/labs/pm-intern"
+  },
+  {
+    "Title": "Data Infrastructure Engineer",
+    "CompanyName": "Google",
+    "Description": "Help build massive-scale database and storage backends. Key skills: <b>SQL</b> performance tuning, <b>Python</b> scripting, distributed compute using <b>Spark</b>, and Linux systems programming.",
+    "Location": "Bengaluru",
+    "PostedDate": "2026-06-26T09:00:00Z",
+    "Salary": "$3000 USD/month",
+    "JobType": "Full-time",
+    "RemoteType": "Onsite",
+    "ExperienceLevel": "1-2 Years",
+    "ApplyUrl": "https://careers.google.com/jobs/data-infra"
+  }
+]

@@ -1,0 +1,52 @@
+@model SmartInternshipPortal.Models.ApplicationUser
+@{
+    ViewData["Title"] = "Notification Settings";
+}
+
+<div class="dashboard-wrapper">
+    <div class="dashboard-header-card">
+        <div class="header-text">
+            <h1>Notification Settings 🔔</h1>
+            <p>Control whether you receive email updates about new internships and application status changes.</p>
+        </div>
+        <div class="header-actions">
+            <a asp-action="Index" class="btn-secondary-custom"><i class="bi bi-arrow-left-short"></i> Back to Dashboard</a>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert-custom success">
+            <span>🎉 @TempData["SuccessMessage"]</span>
+        </div>
+    }
+
+    <div class="widget-card">
+        <div class="widget-header">
+            <h2>Email Notifications</h2>
+        </div>
+        <div class="widget-body">
+            <form asp-controller="Student" asp-action="UpdateSettings" method="post">
+                @Html.AntiForgeryToken()
+
+                <div class="profile-detail-item checkbox-item">
+                    <label asp-for="ReceiveInternshipEmails" class="checkbox-label">
+                        <input asp-for="ReceiveInternshipEmails" />
+                        Receive internship notification emails
+                    </label>
+                </div>
+
+                <div class="profile-detail-item">
+                    <span class="detail-label">Registered Email</span>
+                    <span class="detail-value">@Model.Email</span>
+                </div>
+
+                <div style="margin-top: 20px;">
+                    <button type="submit" class="btn btn-primary" style="padding: 10px 20px; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;">
+                        <i class="bi bi-save-fill"></i> Save Settings
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

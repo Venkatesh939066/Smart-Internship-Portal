@@ -1,0 +1,175 @@
+@model SmartInternshipPortal.Models.Internship
+@{
+    ViewData["Title"] = Model.Title;
+    int matchScore = ViewBag.MatchScore;
+    bool hasApplied = ViewBag.HasApplied;
+    string applicationStatus = ViewBag.ApplicationStatus;
+    bool hasResume = ViewBag.HasResume == true;
+    string? resumeFileName = ViewBag.ResumeFileName as string;
+}
+<div class="dashboard-wrapper">
+    <div class="dashboard-header-card">
+        <div class="header-text">
+            <h1>Internship Opportunity 🎯</h1>
+            <p>Review details and send your application in one click.</p>
+        </div>
+        <div class="header-actions">
+            <a asp-action="Browse" class="btn-secondary-custom">🔙 Back to Listings</a>
+        </div>
+    </div>
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert-custom success mb-4">
+            <span>🎉 @TempData["SuccessMessage"]</span>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert-custom danger mb-4">
+            <span>❌ @TempData["ErrorMessage"]</span>
+        </div>
+    }
+    <div class="details-layout-grid">
+        <!-- Main details card -->
+        <div class="details-main-col">
+            <div class="widget-card">
+                <div class="widget-header border-none pb-0">
+                    <span class="company-badge-large">🏢 <a asp-action="CompanyDetails" asp-route-id="@Model.CompanyId" style="color: var(--primary);">@Model.Company.FullName</a></span>
+                    <h2>@Model.Title</h2>
+                    <div class="job-meta-row mt-2">
+                        <span>📍 <strong>Location:</strong> @Model.Location</span>
+                        <span>📅 <strong>Posted:</strong> @Model.PostedDate.ToString("MMMM dd, yyyy")</span>
+                    </div>
+                </div>
+                <hr class="divider-custom" />
+                <div class="widget-body">
+                    <h3>About the Internship</h3>
+<p class="job-desc-full">@Model.Description</p>
+
+<hr class="divider-custom" />
+
+<h3>🏢 Company Information</h3>
+
+<p><strong>Company Name:</strong> @Model.Company.FullName</p>
+
+<p><strong>Industry:</strong> @Model.Company.CompanyIndustry</p>
+
+<p>
+    <strong>Career portal:</strong>
+    <a href="@Model.Company.CompanyWebsite" target="_blank">
+        @Model.Company.CompanyWebsite
+    </a>
+</p>
+
+<div class="portal-row" style="margin:1rem 0 0 0;">
+    <a asp-action="CompanyDetails" asp-route-id="@Model.CompanyId" class="btn-portal">
+        View Company Jobs
+    </a>
+</div>
+
+<p><strong>About Company:</strong></p>
+<p>@Model.Company.CompanyDescription</p>
+
+<h3 class="mt-4">Required Skills & Tools</h3>
+                    <div class="skill-pills">
+                        @foreach (var isk in Model.InternshipSkills)
+                        {
+                            <span class="skill-pill-large">@isk.Skill.Name</span>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Application actions / Smart match card -->
+        <div class="details-side-col">
+            <div class="widget-card match-sidebar-card">
+                <div class="widget-header">
+                    <h2>Smart Matching</h2>
+                </div>
+                <div class="widget-body text-center">
+                    <div class="match-score-radial" style="--match-deg: @(matchScore * 3.6)deg; --match-color: @(matchScore >= 80 ? "#10B981" : matchScore >= 50 ? "#F59E0B" : "#EF4444")">
+                        <div class="inner-circle">
+                            <span class="score-value">@matchScore%</span>
+                            <span class="score-label">Skills Match</span>
+                        </div>
+                    </div>
+                    <p class="match-explanation mt-3">
+                        @if (matchScore == 100)
+                        {
+                            <span>Perfect match! You have all the skills required for this role.</span>
+                        }
+                        else if (matchScore >= 70)
+                        {
+                            <span>Great match! Your skills are a strong fit for this opportunity.</span>
+                        }
+                        else if (matchScore >= 40)
+                        {
+                            <span>Good match! You have some key skills, but might need to pick up a few extra tools.</span>
+                        }
+                        else
+                        {
+                            <span>Low match. Consider adding more skills in your Profile to improve your match percentage.</span>
+                        }
+                    </p>
+                    <hr class="divider-custom" />
+                    @if (hasApplied)
+                    {
+                        <div class="application-status-box">
+                            <p class="mb-1"><strong>Application Status:</strong></p>
+                            @if (applicationStatus == "Pending")
+                            {
+                                <span class="badge-status pending w-100 py-3 text-center d-block">⏳ Pending Review</span>
+                            }
+                            else if (applicationStatus == "Accepted")
+                            {
+                                <span class="badge-status accepted w-100 py-3 text-center d-block">✅ Accepted (Offer Sent)</span>
+                            }
+                            else
+                            {
+                                <span class="badge-status rejected w-100 py-3 text-center d-block">❌ Rejected</span>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        @if (!string.IsNullOrWhiteSpace(Model.ApplyUrl))
+                        {
+                            <a href="@Model.ApplyUrl" target="_blank" rel="noopener noreferrer" class="btn-primary-custom w-100 py-3 mb-2">🔗 Apply on Company Site</a>
+                        }
+
+                        <form asp-action="Apply" method="post" enctype="multipart/form-data" class="mt-3 text-start">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="internshipId" value="@Model.Id" />
+                            
+                            @if (hasResume)
+                            {
+                                <div class="mb-3">
+                                    <label class="form-label text-muted small"><i class="bi bi-file-earmark-check-fill text-success"></i> Attached Resume:</label>
+                                    <div class="p-2 border rounded bg-light text-truncate mb-2" style="font-size:12px;">
+                                        <i class="bi bi-file-pdf text-danger"></i> @resumeFileName
+                                    </div>
+                                    <details class="mt-2">
+                                        <summary class="text-primary small" style="cursor:pointer; font-weight:600;">Use a different resume?</summary>
+                                        <div class="mt-2">
+                                            <input type="file" name="resumeFile" class="form-control form-control-sm" accept=".pdf,.doc,.docx" />
+                                        </div>
+                                    </details>
+                                </div>
+                                <button type="submit" class="btn-primary-custom w-100 py-3">⚡ Apply with Resume</button>
+                            }
+                            else
+                            {
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold text-dark"><i class="bi bi-cloud-arrow-up-fill text-primary"></i> Upload Resume:</label>
+                                    <input type="file" name="resumeFile" class="form-control" accept=".pdf,.doc,.docx" required />
+                                    <div class="form-text text-muted small" style="font-size:11px;">Upload PDF, DOC, or DOCX. Uploading will auto-fill skills onto your profile.</div>
+                                </div>
+                                <button type="submit" class="btn-primary-custom w-100 py-3">⚡ Upload & Apply</button>
+                            }
+                        </form>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

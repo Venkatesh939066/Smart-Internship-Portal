@@ -1,0 +1,165 @@
+@using System.IO
+@{
+    ViewData["Title"] = "Browse Internships";
+    var browseItems = ViewBag.BrowseItems as IEnumerable<dynamic>;
+    var allSkills = ViewBag.AllSkills as IEnumerable<SmartInternshipPortal.Models.Skill>;
+    int? selectedSkill = ViewBag.SelectedSkill as int?;
+    string searchString = ViewBag.SearchString as string ?? "";
+    string locationFilter = ViewBag.LocationFilter as string ?? "";
+}
+<div class="dashboard-wrapper">
+    <div class="dashboard-header-card">
+        <div class="header-text">
+            <h1>Browse Internships 🔍</h1>
+            <p>Explore opportunities and see how your skills align with company requirements instantly.</p>
+        </div>
+        <div class="header-actions">
+            <a asp-action="Index" class="btn-secondary-custom">🔙 Back to Dashboard</a>
+        </div>
+    </div>
+    <!-- Filter Form -->
+    <div class="filter-card">
+        <form asp-action="Browse" method="get" class="filter-form-custom">
+            <div class="filter-inputs-grid">
+                <div class="filter-group">
+                    <label>Keywords</label>
+                    <input type="text" name="searchString" value="@searchString" placeholder="Job title, description or company" />
+                </div>
+                <div class="filter-group">
+                    <label>Location</label>
+                    <input type="text" name="locationFilter" value="@locationFilter" placeholder="e.g. India, Bangalore" />
+                </div>
+                <div class="filter-group">
+                    <label>Skill Filter</label>
+                    <select name="skillFilter">
+                        <option value="">All Skills</option>
+                        @if (allSkills != null)
+                        {
+                            foreach (var skill in allSkills)
+                            {
+                                if (selectedSkill.HasValue && selectedSkill.Value == skill.Id)
+                                {
+                                    <option value="@skill.Id" selected>@skill.Name</option>
+                                }
+                                else
+                                {
+                                    <option value="@skill.Id">@skill.Name</option>
+                                }
+                            }
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="filter-actions-custom">
+                <button type="submit" class="btn-primary-custom">Filter Listings</button>
+                <a asp-action="Browse" class="btn-secondary-custom">Clear Filters</a>
+            </div>
+        </form>
+    </div>
+    <!-- Jobs Grid -->
+    <!-- Jobs Grid -->
+<div class="jobs-grid">
+    @if (browseItems != null && browseItems.Any())
+    {
+        @foreach (var item in browseItems)
+        {
+            <div class="job-card-wrapper">
+
+                <div class="job-card-header">
+                    @{
+                        var companyName = item.Internship.Company.FullName as string ?? string.Empty;
+                        var companyFileName = new string(companyName.ToLower().Where(c => char.IsLetterOrDigit(c) || c == ' ').ToArray()).Replace(" ", "-");
+                        var companyLogoPath = System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "wwwroot", "images", "company-logos", $"{companyFileName}.svg");
+                        var companyLogoSrc = $"/images/company-logos/{companyFileName}.svg";
+                        var hasCompanyLogo = System.IO.File.Exists(companyLogoPath);
+                    }
+                    <div class="job-card-company">
+                        @if (hasCompanyLogo)
+                        {
+                            <img src="@companyLogoSrc" alt="@item.Internship.Company.FullName logo" class="company-logo-image" />
+                        }
+                        else
+                        {
+                            <span class="company-logo-badge">@(string.IsNullOrWhiteSpace(item.Internship.Company.FullName) ? "C" : item.Internship.Company.FullName.Substring(0,1).ToUpper())</span>
+                        }
+                        <div>
+                            <h3>@item.Internship.Title</h3>
+                            <p class="company-name-line">
+                                🏢
+                                <a asp-action="CompanyDetails"
+                                   asp-route-id="@item.Internship.CompanyId">
+                                    @item.Internship.Company.FullName
+                                </a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="job-card-body">
+
+                    <p class="job-desc-trunc">@item.Internship.Description</p>
+
+                    <p>📍 @item.Internship.Location</p>
+
+                    <p>💰 @item.Internship.Salary</p>
+
+                    <div class="portal-row">
+                        <a asp-action="CompanyDetails" asp-route-id="@item.Internship.CompanyId" class="btn-portal">
+                            View Company Jobs
+                        </a>
+                    </div>
+                </div>
+
+                <div class="job-card-footer">
+
+                    @if (item.HasApplied)
+                    {
+                        <span class="badge-status accepted">
+                            ✅ Applied
+                        </span>
+                    }
+                    else
+                    {
+                        <div class="d-flex gap-2">
+
+                            <form asp-action="SaveJob"
+                                  method="post">
+
+                                                                @Html.AntiForgeryToken()
+
+                                <input type="hidden"
+                                       name="internshipId"
+                                       value="@item.Internship.Id" />
+
+                                <button type="submit"
+                                        class="btn-secondary-custom">
+                                    ❤️ Save Job
+                                </button>
+
+                            </form>
+
+                            <a asp-action="Details"
+                               asp-route-id="@item.Internship.Id"
+                               class="btn-primary-custom">
+                                View & Apply
+                            </a>
+
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+        }
+    }
+    else
+    {
+        <div class="empty-state">
+            <p>No internships found matching your criteria.</p>
+            <a asp-action="Profile"
+               class="btn-sm-custom">
+                Manage Skills
+            </a>
+        </div>
+    }
+</div>

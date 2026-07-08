@@ -1,0 +1,376 @@
+/* ============================
+   Profile Page
+============================ */
+
+body{
+    background:#0f172a;
+    font-family:'Segoe UI',sans-serif;
+}
+
+/* Hero Card */
+
+.profile-hero-card{
+
+    background:#111827;
+
+    border-radius:18px;
+
+    overflow:hidden;
+
+    border:1px solid #273549;
+
+    box-shadow:0 10px 25px rgba(0,0,0,.35);
+
+}
+
+/* Cover Banner */
+
+.profile-cover{
+
+    height:220px;
+
+    background:linear-gradient(135deg,#0A66C2,#2563EB,#4338CA);
+
+}
+
+/* Profile Info */
+
+.profile-info{
+
+    display:flex;
+
+    gap:30px;
+
+    padding:30px;
+
+    margin-top:-80px;
+
+    align-items:flex-end;
+
+}
+
+/* Avatar */
+
+.profile-avatar{
+
+    width:170px;
+
+    height:170px;
+
+    border-radius:50%;
+
+    overflow:hidden;
+
+    border:6px solid #111827;
+
+    background:#fff;
+
+    flex-shrink:0;
+
+}
+
+.profile-avatar-img{
+
+    width:100%;
+
+    height:100%;
+
+    object-fit:cover;
+
+}
+
+/* Details */
+
+.profile-details{
+
+    color:white;
+
+    margin-bottom:10px;
+
+}
+
+.profile-details h2{
+
+    margin:0;
+
+    font-size:34px;
+
+    font-weight:700;
+
+}
+
+.profile-title{
+
+    margin-top:10px;
+
+    color:#cbd5e1;
+
+    font-size:18px;
+
+}
+
+.profile-location{
+
+    margin-top:10px;
+
+    color:#94a3b8;
+
+}
+
+/* Buttons */
+
+.profile-buttons{
+
+    display:flex;
+
+    gap:15px;
+
+    margin-top:25px;
+
+}
+
+.btn-edit{
+
+    background:#0A66C2;
+
+    color:white;
+
+    border:none;
+
+    padding:12px 28px;
+
+    border-radius:8px;
+
+    cursor:pointer;
+
+    font-weight:600;
+
+}
+
+.btn-setting{
+
+    background:#1f2937;
+
+    color:white;
+
+    border:1px solid #334155;
+
+    padding:12px 28px;
+
+    border-radius:8px;
+
+    cursor:pointer;
+
+}
+
+.btn-edit:hover{
+
+    background:#004182;
+
+}
+
+.btn-setting:hover{
+
+    background:#374151;
+
+}
+
+/* ===========================
+   Dark Edit Profile Modal
+=========================== */
+
+.modal-content{
+    background:#111827;
+    color:#fff;
+    border:1px solid #334155;
+    border-radius:18px;
+}
+
+.modal-header{
+    border-bottom:1px solid #334155;
+}
+
+.modal-footer{
+    border-top:1px solid #334155;
+}
+
+.modal-header h4{
+    color:#fff;
+    font-weight:700;
+}
+
+.form-label{
+    color:#cbd5e1;
+    font-weight:600;
+}
+
+.form-control{
+    background:#1e293b;
+    border:1px solid #475569;
+    color:#fff;
+}
+
+.form-control:focus{
+    background:#1e293b;
+    color:#fff;
+    border-color:#0A66C2;
+    box-shadow:none;
+}
+
+.form-control::placeholder{
+    color:#94a3b8;
+}
+
+.form-check-label{
+    color:#cbd5e1;
+}
+
+.btn-close{
+    filter:invert(1);
+}
+
+/* ==========================================
+   Edit Profile Page
+========================================== */
+
+.edit-profile-card{
+    max-width:1200px;
+    margin:40px auto;
+    background:#111827;
+    border:1px solid #273549;
+    border-radius:20px;
+    padding:40px;
+    box-shadow:0 15px 35px rgba(0,0,0,.35);
+}
+
+.edit-header{
+    margin-bottom:35px;
+}
+
+.edit-header h2{
+    font-size:26px;
+    font-weight:600;;
+}
+
+.edit-header p{
+    color:#94a3b8;
+    font-size:18px;
+}
+
+.profile-photo-box{
+    text-align:center;
+}
+
+.edit-profile-image{
+    width:140px;
+    height:140px;
+    border-radius:50%;
+    object-fit:cover;
+    background:#fff;
+    border:4px solid #0A66C2;
+    display:block;
+    margin:0 auto 15px;
+    box-shadow:0 8px 20px rgba(0,0,0,.35);
+}
+
+.edit-profile-card .form-control{
+    background:#1e293b;
+    color:#fff;
+    border:1px solid #475569;
+}
+
+.edit-profile-card .form-control:focus{
+    background:#1e293b;
+    color:#fff;
+    border-color:#0A66C2;
+    box-shadow:none;
+}
+
+.edit-profile-card .form-label{
+    color:#e2e8f0;
+    font-weight:600;
+}
+
+.badge{
+    font-size:15px;
+    border-radius:30px;
+    padding:10px 16px;  
+}
+
+/* ===========================
+   Skills Card
+=========================== */
+
+.skill-card{
+
+    background:#1e293b;
+
+    border:1px solid #334155;
+
+    border-radius:12px;
+
+    padding:14px 18px;
+
+    color:white;
+
+    font-weight:600;
+
+    transition:.3s;
+
+    display:flex;
+
+    align-items:center;
+
+}
+
+.skill-card:hover{
+
+    transform:translateY(-3px);
+
+    border-color:#0A66C2;
+
+    box-shadow:0 8px 20px rgba(10,102,194,.35);
+
+}
+
+.resume-card{
+    background:#1f2937;
+    border-radius:15px;
+    padding:30px;
+    margin-top:35px;
+}
+
+.resume-box{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    margin-top:20px;
+}
+
+.resume-left{
+    display:flex;
+    align-items:center;
+    gap:20px;
+}
+
+.resume-buttons{
+    display:flex;
+    gap:10px;
+}
+
+.resume-card{
+    background:#1f2937;
+    padding:30px;
+    border-radius:16px;
+    margin-top:30px;
+}
+
+.resume-card h3{
+    color:white;
+    margin-bottom:20px;
+}
+
+.resume-card .btn{
+    min-width:160px;
+}

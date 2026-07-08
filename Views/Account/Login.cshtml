@@ -1,0 +1,78 @@
+@model SmartInternshipPortal.Models.LoginViewModel
+@{
+    ViewData["Title"] = "Login";
+}
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-header">
+            <h2>Welcome Back</h2>
+            <p>Access your dashboard and manage your applications or listings</p>
+        </div>
+        <form asp-action="Login" method="post" class="auth-form">
+            <div asp-validation-summary="ModelOnly" class="text-danger-summary"></div>
+            <div class="form-group-custom">
+                <label asp-for="Email"></label>
+                <input asp-for="Email" placeholder="name@example.com" autocomplete="email" />
+                <span asp-validation-for="Email" class="field-validation-error-custom"></span>
+            </div>
+            <div class="form-group-custom">
+                <label asp-for="Password"></label>
+                <div style="position: relative; display: flex; align-items: center; width: 100%;">
+                    <input asp-for="Password" placeholder="••••••••" autocomplete="current-password" style="width: 100%; padding-right: 2.8rem;" />
+                    <i class="bi bi-eye-slash" id="togglePassword" style="position: absolute; right: 1rem; cursor: pointer; color: #9ca3af; font-size: 1.1rem; z-index: 10;"></i>
+                </div>
+                <span asp-validation-for="Password" class="field-validation-error-custom"></span>
+            </div>
+            <div class="form-row-custom">
+                <label class="checkbox-container">
+                    <input asp-for="RememberMe" />
+                    <span class="checkmark"></span>
+                    Remember me?
+                </label>
+            </div>
+            <div class="mb-3">
+    <a asp-controller="Account"
+       asp-action="ForgotPassword"
+       style="color:#7c7cff;text-decoration:none;">
+        Forgot Password?
+       </a>
+        </div>
+            <button type="submit" class="btn-primary-custom w-100">
+    Sign In
+</button>
+        </form>
+
+<hr />
+
+<form asp-action="GoogleLogin" method="post">
+    <button type="submit" class="btn-secondary-custom w-100">
+        <img src="~/images/google-logo.svg" alt="Google" class="google-logo" />
+        <span>Continue with Google</span>
+    </button>
+</form>
+        <div class="auth-footer">
+            <p>Don't have an account? <a asp-action="Register">Create Account</a></p>
+            
+            <div class="demo-accounts">
+                <h4>🔑 Demo Accounts (For Grading)</h4>
+                <ul>
+                    <li><strong>Student:</strong> <code>student@portal.com</code> / <code>Password123!</code></li>
+                    <li><strong>Company:</strong> <code>company@techcorp.com</code> / <code>Password123!</code></li>
+                    <li><strong>Admin:</strong> <code>admin@portal.com</code> / <code>Password123!</code></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        document.getElementById('togglePassword').addEventListener('click', function () {
+            const passwordInput = document.getElementById('Password');
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            this.classList.toggle('bi-eye');
+            this.classList.toggle('bi-eye-slash');
+        });
+    </script>
+}

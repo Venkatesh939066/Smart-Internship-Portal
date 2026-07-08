@@ -1,0 +1,255 @@
+@model SmartInternshipPortal.Models.ApplicationUser
+
+@{
+    ViewData["Title"] = "My Profile";
+}
+
+<link rel="stylesheet" href="~/css/profile.css" asp-append-version="true" />
+
+<div class="container-fluid mt-4">
+
+    <div class="profile-hero-card">
+
+        <!-- Cover Banner -->
+        <div class="profile-cover"></div>
+
+        <!-- Profile Content -->
+        <div class="profile-info">
+
+            <div class="profile-avatar">
+
+    @if (string.IsNullOrEmpty(Model.ProfileImage))
+    {
+        <img src="~/images/default-user.png"
+             alt="Profile Picture"
+             class="profile-avatar-img" />
+    }
+    else
+    {
+        <img src="@Model.ProfileImage"
+             alt="Profile Picture"
+             class="profile-avatar-img" />
+    }
+
+</div>
+            <div class="profile-details">
+
+                <h2>@Model.FullName</h2>
+
+                <p class="profile-title">
+                    @(string.IsNullOrEmpty(Model.ProfessionalTitle) ? "Student / Aspiring Intern" : Model.ProfessionalTitle)
+                </p>
+
+                <p class="profile-location">
+                    <i class="bi bi-geo-alt-fill"></i>
+                    @(string.IsNullOrEmpty(Model.Location) ? "Location not specified" : Model.Location)
+                </p>
+
+                <div class="profile-buttons">
+
+                    <a asp-controller="Student"
+                       asp-action="EditProfile"
+                       class="btn-edit">
+
+                        <i class="bi bi-pencil-square"></i>
+
+                        Edit Profile
+
+                    </a>
+
+                    <a asp-controller="Student"
+                       asp-action="ExportResume"
+                       target="_blank"
+                       class="btn btn-info text-white"
+                       style="padding: 10px 20px; border-radius: 8px; font-weight: 600; text-decoration: none; font-size: 14px; background-color: #0284c7; border: none; display: inline-flex; align-items: center; gap: 6px;">
+                        <i class="bi bi-file-earmark-pdf-fill"></i>
+                        Export Resume
+                    </a>
+
+                    <a href="/Student/Settings" class="btn btn-secondary">Settings</a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+<div class="resume-card mt-4">
+
+    <h3>
+        <i class="bi bi-file-earmark-pdf-fill text-danger"></i>
+        Resume
+    </h3>
+
+    @if (ViewBag.Resume != null)
+    {
+        <div class="alert alert-success">
+
+            <i class="bi bi-check-circle-fill"></i>
+
+            Resume uploaded successfully.
+
+        </div>
+
+        <div class="d-flex gap-2 flex-wrap">
+
+            <a href="@ViewBag.Resume.FilePath"
+               target="_blank"
+               class="btn btn-primary">
+
+                <i class="bi bi-eye-fill"></i>
+                View Resume
+
+            </a>
+
+            <a asp-action="DownloadResume"
+               class="btn btn-success">
+
+                <i class="bi bi-download"></i>
+                Download
+
+            </a>
+
+            <button class="btn btn-warning"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#replaceResume">
+
+                <i class="bi bi-arrow-repeat"></i>
+                Replace Resume
+
+            </button>
+
+            <form asp-action="DeleteResume"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+                <button class="btn btn-danger">
+
+                    <i class="bi bi-trash"></i>
+
+                    Delete
+
+                </button>
+
+            </form>
+
+        </div>
+
+        <div class="collapse mt-3" id="replaceResume">
+
+            <form asp-action="UploadResume"
+                  method="post"
+                  enctype="multipart/form-data">
+
+                @Html.AntiForgeryToken()
+
+                <input type="file"
+                       name="resumeFile"
+                       class="form-control"
+                       accept=".pdf,.doc,.docx"
+                       required />
+
+                <button class="btn btn-primary mt-3">
+
+                    Upload New Resume
+
+                </button>
+
+            </form>
+
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-warning">
+
+            No resume uploaded.
+
+        </div>
+
+        <form asp-action="UploadResume"
+              method="post"
+              enctype="multipart/form-data">
+
+            @Html.AntiForgeryToken()
+
+            <input type="file"
+                   name="resumeFile"
+                   class="form-control"
+                   accept=".pdf,.doc,.docx"
+                   required />
+
+            <button class="btn btn-primary mt-3">
+
+                Upload Resume
+
+            </button>
+
+        </form>
+    }
+
+</div>
+
+<div class="resume-card mt-4">
+    <h3>
+        <i class="bi bi-mortarboard-fill text-primary"></i>
+        Education Details
+    </h3>
+    @if (!string.IsNullOrEmpty(Model.College))
+    {
+        <div class="p-3 mb-2 rounded bg-dark border border-secondary text-white">
+            <h5 class="fw-bold mb-1 text-white">@Model.Degree</h5>
+            <p class="mb-1 text-info"><i class="bi bi-building"></i> @Model.College</p>
+            <p class="mb-1 text-muted small"><i class="bi bi-calendar-event"></i> @(string.IsNullOrEmpty(Model.StartYear) ? "" : Model.StartYear + " – ")@Model.EndYear</p>
+            @if (!string.IsNullOrEmpty(Model.EducationPercentage))
+            {
+                <p class="mb-1 text-white"><i class="bi bi-percent text-success"></i> <strong>Percentage / GPA:</strong> @Model.EducationPercentage</p>
+            }
+            @if (!string.IsNullOrEmpty(Model.Certifications))
+            {
+                <p class="mb-0 text-white"><i class="bi bi-patch-check-fill text-warning"></i> <strong>Certifications:</strong> @Model.Certifications</p>
+            }
+            @if (!string.IsNullOrEmpty(Model.CertificateImage))
+            {
+                <div class="mt-3">
+                    <p class="mb-1 text-white"><strong>Course / Certification Certificate:</strong></p>
+                    <img src="@Model.CertificateImage" 
+                         alt="Course / Certification Certificate" 
+                         style="max-width: 100%; max-height: 300px; border-radius: 8px; border: 1px solid #444;" />
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-warning">
+            <i class="bi bi-info-circle-fill"></i>
+            No education details added yet. Click "Edit Profile" to set your education.
+        </div>
+    }
+</div>
+
+<div class="resume-card mt-4">
+    <h3>
+        <i class="bi bi-folder-fill text-info"></i>
+        Projects / Previous Work
+    </h3>
+    @if (!string.IsNullOrEmpty(Model.ProjectTitle))
+    {
+        <div class="p-3 mb-2 rounded bg-dark border border-secondary text-white">
+            <h5 class="fw-bold mb-1 text-white">@Model.ProjectTitle</h5>
+            <p class="mb-0 text-white-50" style="white-space: pre-line;">@Model.ProjectDescription</p>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-warning mb-0">
+            <i class="bi bi-info-circle-fill"></i>
+            No project details added yet. Click "Edit Profile" to add your projects.
+        </div>
+    }
+</div>

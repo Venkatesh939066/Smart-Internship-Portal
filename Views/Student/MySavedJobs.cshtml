@@ -1,0 +1,126 @@
+@model IEnumerable<SmartInternshipPortal.Models.SavedJob>
+
+@{
+    ViewData["Title"] = "My Saved Jobs";
+}
+
+<div class="dashboard-wrapper">
+
+    <div class="dashboard-header-card">
+        <div class="header-text">
+            <h1>❤️ My Saved Jobs</h1>
+            <p>All internships you have bookmarked.</p>
+        </div>
+
+        <div class="header-actions">
+            <a asp-action="Browse" class="btn-primary-custom">
+                Browse More Jobs
+            </a>
+        </div>
+    </div>
+
+    <div class="jobs-grid">
+
+        @if (Model.Any())
+        {
+            @foreach (var job in Model)
+            {
+                <div class="job-card-wrapper">
+
+                    <div class="job-card-header">
+                        <div class="job-card-company">
+                            @{
+                                var savedCompanyName = job.Internship.Company.FullName as string ?? string.Empty;
+                                var savedCompanyFileName = new string(savedCompanyName.ToLower().Where(c => char.IsLetterOrDigit(c) || c == ' ').ToArray()).Replace(" ", "-");
+                                var savedCompanyLogoPath = System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "wwwroot", "images", "company-logos", $"{savedCompanyFileName}.svg");
+                                var savedCompanyLogoSrc = $"/images/company-logos/{savedCompanyFileName}.svg";
+                                var savedHasCompanyLogo = System.IO.File.Exists(savedCompanyLogoPath);
+                            }
+                            @if (savedHasCompanyLogo)
+                            {
+                                <img src="@savedCompanyLogoSrc" alt="@job.Internship.Company.FullName logo" class="company-logo-image" style="width: 45px; height: 45px; object-fit: contain; border-radius: 8px; margin-right: 12px;" />
+                            }
+                            else
+                            {
+                                <span class="company-logo-badge">@(string.IsNullOrWhiteSpace(job.Internship.Company.FullName) ? "C" : job.Internship.Company.FullName.Substring(0,1).ToUpper())</span>
+                            }
+                            <div>
+                                <h3>@job.Internship.Title</h3>
+                                <p class="company-name-line">
+                                    🏢 <a asp-action="CompanyDetails" asp-route-id="@job.Internship.CompanyId">@job.Internship.Company.FullName</a>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p>📍 @job.Internship.Location</p>
+
+                    <p>💰 @job.Internship.Salary</p>
+
+                    <div class="job-card-footer">
+                        <a asp-action="CompanyDetails" asp-route-id="@job.Internship.CompanyId" class="btn-portal">
+                            View Company Jobs
+                        </a>
+                        <a asp-action="Details"
+                           asp-route-id="@job.Internship.Id"
+                           class="btn-primary-custom">
+
+                            View Internship
+
+                        </a>
+                        
+                        <form asp-action="RemoveSavedJob" method="post" style="display:inline-block; margin-left:8px;">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="savedJobId" value="@job.Id" />
+                            <button type="submit" class="btn-secondary-custom">Remove</button>
+                        </form>
+                    </div>
+
+                </div>
+                @if (!string.IsNullOrEmpty(job.Notes) || !string.IsNullOrEmpty(job.Tags))
+                {
+                    <div class="saved-meta" style="padding:0.5rem 1rem;">
+                        @if (!string.IsNullOrEmpty(job.Notes))
+                        {
+                            <p><strong>Notes:</strong> @job.Notes</p>
+                        }
+                        @if (!string.IsNullOrEmpty(job.Tags))
+                        {
+                            <p><strong>Tags:</strong> @job.Tags</p>
+                        }
+                    </div>
+                }
+                <div class="saved-edit" style="padding:0.75rem 1rem; border-top:1px solid var(--border-color);">
+                    <form asp-action="UpdateSavedJob" method="post" class="d-flex gap-2 align-items-center">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="savedJobId" value="@job.Id" />
+                        <input type="text" name="notes" placeholder="Add notes (optional)" value="@job.Notes" style="flex:1; padding:6px 8px;" />
+                        <input type="text" name="tags" placeholder="Tags (comma-separated)" value="@job.Tags" style="width:220px; padding:6px 8px;" />
+                        <button type="submit" class="btn-sm-custom">Save</button>
+                    </form>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="empty-state">
+
+                <h3>No Saved Jobs Yet</h3>
+
+                <p>
+                    Save internships from Browse page to see them here.
+                </p>
+
+                <a asp-action="Browse"
+                   class="btn-primary-custom">
+
+                    Browse Internships
+
+                </a>
+
+            </div>
+        }
+
+    </div>
+
+</div>

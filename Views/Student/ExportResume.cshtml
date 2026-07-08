@@ -1,0 +1,413 @@
+@model SmartInternshipPortal.Models.ApplicationUser
+@{
+    Layout = null;
+    var name = Model.FullName;
+    var title = Model.ProfessionalTitle ?? "Student Candidate";
+    var email = Model.Email;
+    var phone = Model.PhoneNumber2 ?? Model.PhoneNumber ?? "Not provided";
+    var location = Model.Location ?? "Not provided";
+    var initial = string.IsNullOrWhiteSpace(name) ? "U" : name.Trim()[0].ToString().ToUpper();
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@name - Professional Resume</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <style>
+        :root {
+            --primary: #0f172a;
+            --secondary: #0284c7;
+            --text-dark: #1e293b;
+            --text-light: #64748b;
+            --border: #cbd5e1;
+            --bg-light: #f8fafc;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--text-dark);
+            margin: 0;
+            padding: 0;
+            background-color: #f1f5f9;
+        }
+
+        /* Toolbar styles */
+        .toolbar {
+            background-color: var(--primary);
+            color: #ffffff;
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+        .toolbar-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 0;
+        }
+        .btn-print {
+            background-color: var(--secondary);
+            color: #ffffff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: background 0.2s;
+        }
+        .btn-print:hover {
+            background-color: #0369a1;
+        }
+
+        /* Resume A4 Layout */
+        .resume-page {
+            width: 210mm;
+            min-height: 297mm;
+            padding: 20mm;
+            margin: 30px auto;
+            background: #ffffff;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            box-sizing: border-box;
+            position: relative;
+        }
+
+        /* Resume Header */
+        .resume-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 2px solid var(--secondary);
+            padding-bottom: 20px;
+            margin-bottom: 25px;
+        }
+        .header-left h1 {
+            margin: 0;
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: var(--primary);
+        }
+        .header-left h2 {
+            margin: 6px 0 0;
+            font-size: 16px;
+            font-weight: 500;
+            color: var(--secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .header-right {
+            text-align: right;
+            font-size: 12px;
+            color: var(--text-light);
+            line-height: 1.6;
+        }
+        .header-right i {
+            color: var(--secondary);
+            margin-right: 4px;
+        }
+
+        /* Layout Grid */
+        .resume-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 25px;
+        }
+
+        /* Section Headings */
+        .section-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+            border-bottom: 1.5px solid var(--border);
+            padding-bottom: 6px;
+            margin-top: 0;
+            margin-bottom: 15px;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .section-title i {
+            color: var(--secondary);
+        }
+
+        /* Timeline Items */
+        .timeline-item {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        .timeline-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 4px;
+        }
+        .timeline-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--primary);
+            margin: 0;
+        }
+        .timeline-subtitle {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--secondary);
+            margin: 2px 0 4px;
+        }
+        .timeline-date {
+            font-size: 12px;
+            color: var(--text-light);
+            font-weight: 500;
+        }
+        .timeline-desc {
+            font-size: 12px;
+            color: var(--text-light);
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        /* Skill Badges */
+        .skills-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 25px;
+        }
+        .skill-badge {
+            background-color: var(--bg-light);
+            color: var(--primary);
+            font-size: 11px;
+            font-weight: 500;
+            padding: 4px 10px;
+            border-radius: 4px;
+            border: 1px solid var(--border);
+        }
+
+        /* Contact Details Side Block */
+        .side-block {
+            margin-bottom: 25px;
+        }
+        .contact-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 12px;
+            margin-bottom: 10px;
+            color: var(--text-dark);
+        }
+        .contact-row i {
+            color: var(--secondary);
+            font-size: 14px;
+            width: 16px;
+            text-align: center;
+        }
+        .contact-row a {
+            color: inherit;
+            text-decoration: none;
+        }
+        .contact-row a:hover {
+            color: var(--secondary);
+        }
+
+        /* Summary statement */
+        .summary-text {
+            font-size: 12px;
+            color: var(--text-light);
+            line-height: 1.6;
+            margin-top: 0;
+            margin-bottom: 25px;
+        }
+
+        /* Printing adaptations */
+        @@media print {
+            body {
+                background-color: #ffffff;
+                color: #000000;
+            }
+            .toolbar {
+                display: none !important;
+            }
+            .resume-page {
+                box-shadow: none;
+                margin: 0;
+                padding: 0;
+                width: 100%;
+                min-height: auto;
+            }
+            .section-title {
+                border-bottom: 1px solid #000000;
+            }
+            .skill-badge {
+                border: 1px solid #000000;
+                background-color: transparent;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="toolbar">
+        <h2 class="toolbar-title">Professional Resume Builder</h2>
+        <button class="btn-print" onclick="window.print()"><i class="bi bi-printer"></i> Print / Save PDF</button>
+    </div>
+
+    <div class="resume-page">
+        <!-- Header -->
+        <header class="resume-header">
+            <div class="header-left">
+                <h1>@name</h1>
+                <h2>@title</h2>
+            </div>
+            <div class="header-right">
+                <div><i class="bi bi-envelope"></i> @email</div>
+                <div><i class="bi bi-telephone"></i> @phone</div>
+                <div><i class="bi bi-geo-alt"></i> @location</div>
+            </div>
+        </header>
+
+        <div class="resume-grid">
+            <!-- Left Side: Main Column -->
+            <div class="main-column">
+                <!-- Summary Section -->
+                <section class="side-block">
+                    <h3 class="section-title"><i class="bi bi-person-fill"></i> Summary</h3>
+                    <p class="summary-text">
+                        @(string.IsNullOrEmpty(Model.About) 
+                            ? "Highly motivated and detail-oriented technical candidate looking to secure a challenging internship opportunity where I can apply my development skills, solve real-world problems, and contribute value to the engineering team." 
+                            : Model.About)
+                    </p>
+                </section>
+
+                <!-- Experience Section -->
+                <section class="side-block">
+                    <h3 class="section-title"><i class="bi bi-briefcase-fill"></i> Work Experience</h3>
+                    @if (!string.IsNullOrEmpty(Model.CompanyName))
+                    {
+                        <div class="timeline-item">
+                            <div class="timeline-header">
+                                <h4 class="timeline-title">@Model.Position</h4>
+                                <span class="timeline-date">Academic / Job Experience</span>
+                            </div>
+                            <p class="timeline-subtitle">@Model.CompanyName</p>
+                            <p class="timeline-desc">
+                                @(string.IsNullOrEmpty(Model.ExperienceDescription) ? "Details not specified." : Model.ExperienceDescription)
+                            </p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="timeline-item">
+                            <div class="timeline-header">
+                                <h4 class="timeline-title">Project Intern / Freelance Developer</h4>
+                                <span class="timeline-date">Present</span>
+                            </div>
+                            <p class="timeline-subtitle">Self-Employed</p>
+                            <p class="timeline-desc">
+                                Developed various web application designs, handled data structures, and worked on programming projects utilizing modern software frameworks.
+                            </p>
+                        </div>
+                    }
+                </section>
+
+                <!-- Education Section -->
+                <section class="side-block">
+                    <h3 class="section-title"><i class="bi bi-mortarboard-fill"></i> Education</h3>
+                    @if (!string.IsNullOrEmpty(Model.College))
+                    {
+                        <div class="timeline-item">
+                            <div class="timeline-header">
+                                <h4 class="timeline-title">@Model.Degree</h4>
+                                <span class="timeline-date">@Model.StartYear – @Model.EndYear</span>
+                            </div>
+                            <p class="timeline-subtitle">@Model.College</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="timeline-item">
+                            <div class="timeline-header">
+                                <h4 class="timeline-title">Bachelor of Technology / Bachelor of Science</h4>
+                                <span class="timeline-date">2023 – 2027</span>
+                            </div>
+                            <p class="timeline-subtitle">Partner University</p>
+                        </div>
+                    }
+                </section>
+            </div>
+
+            <!-- Right Side: Side Column -->
+            <div class="side-column">
+                <!-- Skills Block -->
+                <section class="side-block">
+                    <h3 class="section-title"><i class="bi bi-code-slash"></i> Key Skills</h3>
+                    <div class="skills-container">
+                        @if (Model.UserSkills != null && Model.UserSkills.Any())
+                        {
+                            foreach (var us in Model.UserSkills)
+                            {
+                                <span class="skill-badge">@us.Skill.Name</span>
+                            }
+                        }
+                        else
+                        {
+                            <span class="skill-badge">C#</span>
+                            <span class="skill-badge">ASP.NET Core</span>
+                            <span class="skill-badge">SQL</span>
+                            <span class="skill-badge">HTML & CSS</span>
+                            <span class="skill-badge">JavaScript</span>
+                        }
+                    </div>
+                </section>
+
+                <!-- Professional Profiles -->
+                <section class="side-block">
+                    <h3 class="section-title"><i class="bi bi-link-45deg"></i> Connect</h3>
+                    
+                    @if (!string.IsNullOrEmpty(Model.LinkedInUrl))
+                    {
+                        <div class="contact-row">
+                            <i class="bi bi-linkedin"></i>
+                            <a href="@Model.LinkedInUrl" target="_blank">linkedin.com/profile</a>
+                        </div>
+                    }
+                    
+                    @if (!string.IsNullOrEmpty(Model.GitHubUrl))
+                    {
+                        <div class="contact-row">
+                            <i class="bi bi-github"></i>
+                            <a href="@Model.GitHubUrl" target="_blank">github.com/profile</a>
+                        </div>
+                    }
+                    
+                    @if (!string.IsNullOrEmpty(Model.PortfolioUrl))
+                    {
+                        <div class="contact-row">
+                            <i class="bi bi-globe"></i>
+                            <a href="@Model.PortfolioUrl" target="_blank">portfolio-website</a>
+                        </div>
+                    }
+                    
+                    <div class="contact-row">
+                        <i class="bi bi-shield-check"></i>
+                        <span>SmartIntern Candidate</span>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

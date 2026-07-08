@@ -1,0 +1,127 @@
+@model SmartInternshipPortal.Models.ApplicationUser
+@{
+    ViewData["Title"] = Model.FullName;
+    var listingItems = ViewBag.ListingItems as IEnumerable<dynamic>;
+}
+
+<div class="dashboard-wrapper">
+    <div class="company-profile-hero">
+        <div>
+            <span class="dashboard-hero-badge"><i class="bi bi-building"></i> Company Profile</span>
+            <h1>@Model.FullName</h1>
+            <p>Learn about this employer and explore their open internship positions.</p>
+        </div>
+        <div class="header-actions">
+            <a href="javascript:history.back()" class="btn-secondary-custom"><i class="bi bi-arrow-left"></i> Back</a>
+            @if (!string.IsNullOrWhiteSpace(Model.CompanyWebsite))
+            {
+                <a href="@Model.CompanyWebsite" target="_blank" rel="noopener noreferrer" class="btn-primary-custom">
+                    <i class="bi bi-box-arrow-up-right"></i> Visit Website
+                </a>
+            }
+        </div>
+    </div>
+
+    <div class="details-layout-grid">
+        <div class="details-main-col">
+            <div class="widget-card">
+                <div class="widget-header">
+                    <h2><i class="bi bi-info-circle"></i> About the Company</h2>
+                </div>
+                <div class="widget-body">
+                    <div class="company-meta-grid">
+                        @if (!string.IsNullOrEmpty(Model.CompanyIndustry))
+                        {
+                            <div class="company-meta-chip">
+                                <span>Industry</span>
+                                <strong><i class="bi bi-briefcase"></i> @Model.CompanyIndustry</strong>
+                            </div>
+                        }
+                        @if (!string.IsNullOrEmpty(Model.CompanyWebsite))
+                        {
+                            <div class="company-meta-chip">
+                                <span>Careers Portal</span>
+                                <a href="@Model.CompanyWebsite" target="_blank" rel="noopener noreferrer">
+                                    <i class="bi bi-link-45deg"></i> View Careers
+                                </a>
+                            </div>
+                        }
+                        <div class="company-meta-chip">
+                            <span>Open Positions</span>
+                            <strong>@(listingItems?.Count() ?? 0) listings</strong>
+                        </div>
+                    </div>
+                    <p class="job-desc-full">
+                        @if (!string.IsNullOrEmpty(Model.CompanyDescription))
+                        {
+                            @Model.CompanyDescription
+                        }
+                        else
+                        {
+                            <span class="text-muted">No description provided yet by this company.</span>
+                        }
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="details-side-col">
+            <div class="widget-card">
+                <div class="widget-header">
+                    <h2><i class="bi bi-briefcase"></i> Open Positions</h2>
+                    <span class="badge-accent">@(listingItems?.Count() ?? 0)</span>
+                </div>
+                <div class="widget-body">
+                    @if (listingItems != null && listingItems.Any())
+                    {
+                        <div class="application-cards">
+                            @foreach (var item in listingItems)
+                            {
+                                <div class="application-card">
+                                    <div class="application-card-top">
+                                        <div>
+                                            <h4>@item.Internship.Title</h4>
+                                            <p class="job-meta" style="margin: 0;">
+                                                <i class="bi bi-geo-alt"></i> @item.Internship.Location &nbsp;·&nbsp;
+                                                <i class="bi bi-calendar3"></i> @item.Internship.PostedDate.ToString("MMM dd, yyyy")
+                                            </p>
+                                        </div>
+                                        <span class="match-badge-pill" style="--match-score-color: @(item.MatchScore >= 80 ? "#22c55e" : item.MatchScore >= 50 ? "#eab308" : "#ef4444")">
+                                            @item.MatchScore%
+                                        </span>
+                                    </div>
+                                    <div class="skill-pills" style="margin-bottom: 0.65rem;">
+                                        @foreach (var isk in item.Internship.InternshipSkills)
+                                        {
+                                            <span class="skill-pill">@isk.Skill.Name</span>
+                                        }
+                                    </div>
+                                    <div class="application-card-footer">
+                                        @if (item.HasApplied)
+                                        {
+                                            <span class="badge-status accepted"><i class="bi bi-check-lg"></i> Applied</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge-status pending">Open</span>
+                                        }
+                                        <a asp-action="Details" asp-route-id="@item.Internship.Id" class="btn-sm-custom">
+                                            <i class="bi bi-arrow-right"></i> View & Apply
+                                        </a>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="empty-state">
+                            <div class="empty-state-icon"><i class="bi bi-inbox"></i></div>
+                            <p>No open positions listed at the moment.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

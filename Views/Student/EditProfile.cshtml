@@ -1,0 +1,365 @@
+@model SmartInternshipPortal.Models.ApplicationUser
+
+@{
+    ViewData["Title"] = "Edit Profile";
+
+    var startMonth = "";
+    var startYearVal = "";
+    if (!string.IsNullOrEmpty(Model.StartYear))
+    {
+        var parts = Model.StartYear.Split(' ');
+        if (parts.Length == 2)
+        {
+            startMonth = parts[0];
+            startYearVal = parts[1];
+        }
+        else if (parts.Length == 1 && parts[0].Length == 4)
+        {
+            startYearVal = parts[0];
+        }
+    }
+
+    var endMonth = "";
+    var endYearVal = "";
+    if (!string.IsNullOrEmpty(Model.EndYear))
+    {
+        var parts = Model.EndYear.Split(' ');
+        if (parts.Length == 2)
+        {
+            endMonth = parts[0];
+            endYearVal = parts[1];
+        }
+        else if (parts.Length == 1 && parts[0].Length == 4)
+        {
+            endYearVal = parts[0];
+        }
+    }
+}
+
+<link rel="stylesheet" href="~/css/profile.css" asp-append-version="true" />
+
+<div class="container py-4">
+    <div class="edit-profile-card">
+        <div class="edit-header">
+            <h2>
+                <i class="bi bi-pencil-square"></i>
+                Edit Profile
+            </h2>
+            <p>
+                Keep your profile updated to get better internship recommendations.
+            </p>
+        </div>
+
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert-custom success" style="margin-bottom: 20px;">
+                <span>🎉 @TempData["SuccessMessage"]</span>
+            </div>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert-custom error" style="margin-bottom: 20px;">
+                <span>❌ @TempData["ErrorMessage"]</span>
+            </div>
+        }
+
+        <form asp-action="UpdateProfile"
+              method="post"
+              enctype="multipart/form-data">
+
+            @Html.AntiForgeryToken()
+
+            <div class="row">
+                <div class="col-md-3 text-center">
+                    @if (string.IsNullOrEmpty(Model.ProfileImage))
+                    {
+                        <img src="~/images/default-user.png"
+                             id="profilePreview"
+                             class="edit-profile-image"
+                             alt="Profile" />
+                    }
+                    else
+                    {
+                        <img src="@Model.ProfileImage"
+                             id="profilePreview"
+                             class="edit-profile-image"
+                             alt="Profile" />
+                    }
+
+                    <label for="profilePhoto" class="btn btn-primary w-100 mt-3">
+                        <i class="bi bi-camera-fill"></i>
+                        Change Photo
+                    </label>
+
+                    <input type="file"
+                           id="profilePhoto"
+                           name="profilePhoto"
+                           accept=".jpg,.jpeg,.png"
+                           style="display:none;"
+                           onchange="previewImage(this);" />
+                </div>
+
+                <div class="col-md-9">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Full Name</label>
+                            <input type="text"
+                                   name="fullName"
+                                   class="form-control"
+                                   value="@Model.FullName"
+                                   required />
+                            <span class="text-danger small">@Html.ValidationMessage("fullName")</span>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Professional Title</label>
+                            <input type="text"
+                                   name="professionalTitle"
+                                   class="form-control"
+                                   value="@Model.ProfessionalTitle" />
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Email Address</label>
+                            <input type="email"
+                                   class="form-control"
+                                   value="@Model.Email"
+                                   readonly />
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Phone Number</label>
+                            <input type="text"
+                                   name="phoneNumber"
+                                   class="form-control"
+                                   value="@Model.PhoneNumber2" />
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Location</label>
+                        <input type="text"
+                               name="location"
+                               class="form-control"
+                               value="@Model.Location" />
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label">About Me</label>
+                        <textarea name="about"
+                                  class="form-control"
+                                  rows="6"
+                                  placeholder="Tell recruiters about yourself...">@Model.About</textarea>
+                    </div>
+
+                    <hr class="my-4" />
+
+                    <h4 class="mb-3 text-white"><i class="bi bi-mortarboard-fill text-primary"></i> Education Details</h4>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">College / University / School Name</label>
+                            <input type="text"
+                                   name="college"
+                                   class="form-control"
+                                   value="@Model.College"
+                                   placeholder="e.g. Partner University" />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Degree / Qualification</label>
+                            <input type="text"
+                                   name="degree"
+                                   list="degreeOptions"
+                                   class="form-control"
+                                   value="@Model.Degree"
+                                   placeholder="e.g. Bachelor's Degree" />
+                            <datalist id="degreeOptions">
+                                <option value="School / High School" />
+                                <option value="Intermediate / Pre-University" />
+                                <option value="Bachelor's Degree" />
+                                <option value="Master's Degree" />
+                                <option value="Doctorate (PhD)" />
+                            </datalist>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Start Month & Year</label>
+                            <div class="d-flex gap-2">
+                                <select name="startMonth" class="form-select form-control">
+                                    <option value="">Month</option>
+                                    @foreach (var m in new[] { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" })
+                                    {
+                                        <option value="@m" selected="@(startMonth == m)">@m</option>
+                                    }
+                                </select>
+                                <select name="startYearVal" class="form-select form-control">
+                                    <option value="">Year</option>
+                                    @for (int y = DateTime.Now.Year + 10; y >= DateTime.Now.Year - 10; y--)
+                                    {
+                                        <option value="@y" selected="@(startYearVal == y.ToString())">@y</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Passing Month & Year</label>
+                            <div class="d-flex gap-2">
+                                <select name="endMonth" class="form-select form-control">
+                                    <option value="">Month</option>
+                                    @foreach (var m in new[] { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" })
+                                    {
+                                        <option value="@m" selected="@(endMonth == m)">@m</option>
+                                    }
+                                </select>
+                                <select name="endYearVal" class="form-select form-control">
+                                    <option value="">Year</option>
+                                    @for (int y = DateTime.Now.Year + 10; y >= DateTime.Now.Year - 10; y--)
+                                    {
+                                        <option value="@y" selected="@(endYearVal == y.ToString())">@y</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Education Percentage / GPA</label>
+                            <input type="text"
+                                   name="educationPercentage"
+                                   class="form-control"
+                                   value="@Model.EducationPercentage"
+                                   placeholder="e.g. 85% or 8.5 CGPA" />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Certificates / Certifications</label>
+                            <input type="text"
+                                   name="certifications"
+                                   class="form-control"
+                                   value="@Model.Certifications"
+                                   placeholder="e.g. AWS Cloud Practitioner, Java Certified" />
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            <label class="form-label">Course / Certification Certificate Photo</label>
+                            <input type="file"
+                                   name="certificatePhoto"
+                                   class="form-control"
+                                   accept=".jpg,.jpeg,.png"
+                                   onchange="previewCertificate(this);" />
+                            <div class="mt-2">
+                                @if (!string.IsNullOrEmpty(Model.CertificateImage))
+                                {
+                                    <img src="@Model.CertificateImage"
+                                         id="certificatePreview"
+                                         style="max-width: 300px; border-radius: 8px; border: 1px solid #444;"
+                                         alt="Certificate" />
+                                }
+                                else
+                                {
+                                    <img id="certificatePreview"
+                                         style="max-width: 300px; border-radius: 8px; border: 1px solid #444; display: none;"
+                                         alt="Certificate" />
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-4" />
+
+                    <h4 class="mb-3 text-white"><i class="bi bi-folder-fill text-info"></i> Project Details</h4>
+                    <div class="mb-3">
+                        <label class="form-label">Project Title</label>
+                        <input type="text"
+                               name="projectTitle"
+                               class="form-control"
+                               value="@Model.ProjectTitle"
+                               placeholder="e.g. Smart Internship Portal" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Project Description</label>
+                        <textarea name="projectDescription"
+                                  class="form-control"
+                                  rows="4"
+                                  placeholder="Describe your project, technologies used, and your contributions...">@Model.ProjectDescription</textarea>
+                    </div>
+
+                    <hr class="my-4" />
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold fs-5">
+                            <i class="bi bi-lightning-charge-fill text-warning"></i>
+                            Skills
+                        </label>
+
+                        @if (Model.UserSkills != null && Model.UserSkills.Any())
+                        {
+                            <div class="row g-2 mt-2">
+                                @foreach (var userSkill in Model.UserSkills)
+                                {
+                                    <div class="col-md-4">
+                                        <div class="skill-card">
+                                            <i class="bi bi-check-circle-fill text-success"></i>
+                                            <span class="ms-2">@userSkill.Skill.Name</span>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="alert alert-dark border border-secondary mt-2">
+                                <i class="bi bi-info-circle-fill"></i>
+                                No skills added yet.
+                            </div>
+                        }
+                    </div>
+
+                    <a asp-controller="Student"
+                       asp-action="ManageSkills"
+                       class="btn btn-outline-light mt-3">
+                        <i class="bi bi-plus-circle"></i>
+                        Manage Skills
+                    </a>
+
+                    <hr class="my-4" />
+
+                    <div class="text-end mt-4">
+                        <a asp-action="Profile" class="btn btn-secondary me-2">Cancel</a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i>
+                            Save Changes
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function previewImage(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                document.getElementById('profilePreview').setAttribute('src', e.target.result);
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function previewCertificate(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                var preview = document.getElementById('certificatePreview');
+                preview.setAttribute('src', e.target.result);
+                preview.style.display = 'block';
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+</script>

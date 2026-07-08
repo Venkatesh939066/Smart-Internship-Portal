@@ -1,0 +1,241 @@
+@using System.IO
+@inject Microsoft.AspNetCore.Identity.UserManager<SmartInternshipPortal.Models.ApplicationUser> UserManager
+@{
+    var isAuthenticated = User.Identity?.IsAuthenticated == true;
+    SmartInternshipPortal.Models.ApplicationUser? currentUser = null;
+    if (isAuthenticated)
+    {
+        currentUser = await UserManager.GetUserAsync(User);
+    }
+    var displayName = currentUser?.FullName ?? User.Identity?.Name ?? "User";
+    var role = currentUser?.Role ?? "User";
+    var isStudent = isAuthenticated && (currentUser?.Role == "Student" || User.IsInRole("Student") || User.IsInRole("Admin"));
+    var isCompany = isAuthenticated && (currentUser?.Role == "Company" || User.IsInRole("Company"));
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString();
+    var currentAction = ViewContext.RouteData.Values["action"]?.ToString();
+    string Active(string controller, string action) =>
+        controller == currentController && action == currentAction ? "active" : string.Empty;
+    var avatarInitial = string.IsNullOrWhiteSpace(displayName) ? "U" : displayName.Trim()[0].ToString().ToUpper();
+    var logoFile = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "logo.svg");
+    var hasLogo = System.IO.File.Exists(logoFile);
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - SmartInternship</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="~/css/site.css?v=2.3" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/dashboard.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/new.styles.css" asp-append-version="true" />
+</head>
+<body>
+@if (isAuthenticated && (isStudent || isCompany))
+{
+    <div class="app-shell">
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+        <aside class="sidebar" id="sidebar">
+            <a class="sidebar-brand text-decoration-none" asp-controller="@(isCompany ? "Company" : "Student")" asp-action="Index">
+                @if (hasLogo)
+                {
+                    <img src="~/images/logo.svg" alt="SmartInternship" class="brand-logo-image" />
+                }
+                else
+                {
+                    <span class="brand-logo-circle">SI</span>
+                }
+                <span class="sidebar-brand-text">SmartInternship</span>
+            </a>
+
+            <nav class="sidebar-nav">
+                @if (isStudent)
+                {
+                    <span class="sidebar-section-label">Main</span>
+                    <a class="sidebar-link @Active("Student", "Index")" asp-controller="Student" asp-action="Index">
+                        <i class="bi bi-grid-1x2-fill"></i> Dashboard
+                    </a>
+                    <a class="sidebar-link @Active("Student", "Browse")" asp-controller="Student" asp-action="Browse">
+                        <i class="bi bi-search"></i> Browse Jobs
+                    </a>
+                    <a class="sidebar-link @Active("Home", "Companies")" asp-controller="Home" asp-action="Companies">
+                        <i class="bi bi-building"></i> Browse Companies
+                    </a>
+                    <a class="sidebar-link @Active("Student", "MySavedJobs")" asp-controller="Student" asp-action="MySavedJobs">
+                        <i class="bi bi-bookmark-heart"></i> Saved Jobs
+                    </a>
+                    <a class="sidebar-link @Active("Feed", "Index")" asp-controller="Feed" asp-action="Index">
+                        <i class="bi bi-chat-quote-fill"></i> Community Feed
+                    </a>
+
+                    <span class="sidebar-section-label">Account</span>
+                    <a class="sidebar-link @Active("Student", "Profile")" asp-controller="Student" asp-action="Profile">
+                        <i class="bi bi-person-circle"></i> My Profile
+                    </a>
+                    <a class="sidebar-link @Active("Student", "Settings")" asp-controller="Student" asp-action="Settings">
+                        <i class="bi bi-gear"></i> Settings
+                    </a>
+                }
+                else if (isCompany)
+                {
+                    <span class="sidebar-section-label">Workspace</span>
+                    <a class="sidebar-link @Active("Company", "Index")" asp-controller="Company" asp-action="Index">
+                        <i class="bi bi-building"></i> Dashboard
+                    </a>
+                    <a class="sidebar-link @Active("Company", "Create")" asp-controller="Company" asp-action="Create">
+                        <i class="bi bi-plus-circle"></i> Post Internship
+                    </a>
+                    <a class="sidebar-link @Active("Company", "Profile")" asp-controller="Company" asp-action="Profile">
+                        <i class="bi bi-pencil-square"></i> Company Profile
+                    </a>
+                    <a class="sidebar-link @Active("Home", "Companies")" asp-controller="Home" asp-action="Companies">
+                        <i class="bi bi-building-fill"></i> Companies Directory
+                    </a>
+                    <a class="sidebar-link @Active("Feed", "Index")" asp-controller="Feed" asp-action="Index">
+                        <i class="bi bi-chat-quote-fill"></i> Community Feed
+                    </a>
+                }
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="sidebar-user">
+                    <div class="sidebar-avatar">
+                        @if (currentUser != null && !string.IsNullOrEmpty(currentUser.ProfileImage))
+                        {
+                            <img src="@currentUser.ProfileImage" alt="@displayName" class="sidebar-avatar-img" />
+                        }
+                        else
+                        {
+                            @avatarInitial
+                        }
+                    </div>
+                    <div class="sidebar-user-info">
+                        <div class="sidebar-user-name">@displayName</div>
+                        <div class="sidebar-user-role">@role</div>
+                    </div>
+                </div>
+                <form asp-controller="Account" asp-action="Logout" method="post">
+                    <button type="submit" class="btn-ghost danger w-100">
+                        <i class="bi bi-box-arrow-right"></i> Sign Out
+                    </button>
+                </form>
+            </div>
+        </aside>
+
+        <div class="app-main">
+            <header class="topbar">
+                <div class="d-flex align-items-center gap-3">
+                    <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle menu">
+                        <i class="bi bi-list"></i>
+                    </button>
+                    <h1 class="topbar-title">@ViewData["Title"]</h1>
+                </div>
+                <div class="topbar-actions">
+                    @if (isStudent)
+                    {
+                        <a asp-controller="Student" asp-action="Browse" class="btn-primary-custom">
+                            <i class="bi bi-search"></i> Find Internships
+                        </a>
+                    }
+                    else if (isCompany)
+                    {
+                        <a asp-controller="Company" asp-action="Create" class="btn-primary-custom">
+                            <i class="bi bi-plus-lg"></i> New Posting
+                        </a>
+                    }
+                </div>
+            </header>
+
+            <div class="main-wrapper-container">
+                <main role="main">
+                    @RenderBody()
+                </main>
+            </div>
+
+            <footer class="footer-custom">
+                &copy; 2026 Smart Internship Portal — Capstone Project
+            </footer>
+        </div>
+    </div>
+}
+else
+{
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-dark navbar-custom">
+            <div class="container-fluid">
+                <a class="navbar-brand navbar-brand-custom" asp-area="" asp-controller="Home" asp-action="Index">
+                    @if (hasLogo)
+                    {
+                        <img src="~/images/logo.svg" alt="SmartInternship" class="brand-logo-image" />
+                    }
+                    else
+                    {
+                        <span class="brand-logo-circle">SI</span>
+                    }
+                    SmartInternship
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
+                        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item">
+                            <a class="nav-link nav-link-custom @Active("Home", "Index")" asp-controller="Home" asp-action="Index">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link nav-link-custom @Active("Student", "Browse")" asp-controller="Student" asp-action="Browse">Internships</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link nav-link-custom @Active("Home", "Companies")" asp-controller="Home" asp-action="Companies">Companies</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link nav-link-custom @Active("Home", "Privacy")" asp-controller="Home" asp-action="Privacy">About</a>
+                        </li>
+                    </ul>
+                    <ul class="navbar-nav gap-2 align-items-center">
+                        @if (isAuthenticated)
+                        {
+                            <li class="nav-item text-light d-flex align-items-center">
+                                <span class="me-2">Welcome, <strong>@displayName</strong></span>
+                                <span class="nav-user-badge">@role</span>
+                            </li>
+                            <li class="nav-item ms-2">
+                                <form asp-controller="Account" asp-action="Logout" method="post">
+                                    <button type="submit" class="btn-sm-custom">Sign Out</button>
+                                </form>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="btn-secondary-custom px-3 py-2 text-decoration-none" asp-controller="Account" asp-action="Login">Sign In</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="btn-primary-custom px-3 py-2 text-decoration-none" asp-controller="Account" asp-action="Register">Get Started</a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="main-wrapper-container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+    <footer class="footer-custom">
+        <div class="container-fluid">
+            &copy; 2026 Smart Internship Portal — Capstone Project
+        </div>
+    </footer>
+}
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="~/js/site.js" asp-append-version="true"></script>
+@await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
