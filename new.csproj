@@ -12,6 +12,10 @@
     <Content Remove="SmartInternshipPortal.Tests\**" />
     <EmbeddedResource Remove="SmartInternshipPortal.Tests\**" />
     <None Remove="SmartInternshipPortal.Tests\**" />
+    <Compile Remove="Smart_Internship_Portal\**" />
+    <Content Remove="Smart_Internship_Portal\**" />
+    <EmbeddedResource Remove="Smart_Internship_Portal\**" />
+    <None Remove="Smart_Internship_Portal\**" />
   </ItemGroup>
 
   <ItemGroup>

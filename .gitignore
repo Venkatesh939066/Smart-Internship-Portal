@@ -29,3 +29,6 @@ App_Data/DataProtectionKeys/
 
 # Agents configuration
 .agents/
+
+# Duplicate/Extracted project folders
+Smart_Internship_Portal/
